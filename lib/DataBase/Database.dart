@@ -16,12 +16,15 @@ class SQLDB {
   instialDB() async {
     String databasepath = await getDatabasesPath() ;
     String path = join(databasepath , 'Car Rental System DataBase.db') ;
-    Database mydb = await openDatabase(path , onCreate: _onCreate , version: 1  , onUpgrade:_onUpgrade ) ;
+    Database mydb = await openDatabase(path , onCreate: _onCreate , version: 2  , onUpgrade:_onUpgrade ) ;
     return mydb ;
   }
 
   _onUpgrade(Database db , int oldvertion , int newVersion){
     print(db.path);
+    insertData("INSERT INTO Department ('DepartmentName' , 'DepartmentLocation' , 'DepartmentStartDate') VALUES ('Long Term','A','2010'), ('Short Term','B','2022'), ('Widding','C','2010') , ('MotorCycle','D','2014') ");
+    insertData("INSERT INTO Make ('MakerName' , 'OriginCountry' ) VALUES ( 'Abarth' , 'Italy' ) , ('Alfa Romeo' , 'Italy' ) , ( 'Aston Martin' , 'England' ) , ( 'Audi' , 'Germany' ) , ( 'Bentley' , ' England' ) , ( 'BMW' , 'Germany' ) , ( 'Bugatti' , 'France' ) , ( 'Cadillac' , 'America' ) , ('Caterham' , 'England' ) , ( 'Chery' , 'China' ) , ( 'Chevrolet' , 'America' ) , ( 'Chrysler' , 'America' ) , ( 'Citroen' , 'France' ) , ( 'Daewoo' , 'South Korea' ) , ( 'Daihatsu' , 'Japan' ) , ( 'Datsun' , 'Japan' ) ,( 'Dodge' , 'America' ) , ( 'Ferrari' , 'Italy' ) , ( 'Fiat' , 'Italy' ) , ( 'Ford' , 'America' ) , ( 'Genesis' , 'South Korea' ) , ( 'Great Wall' , 'China' ) , ( 'Haval' , 'China' ) , ( 'Holden' , 'Australia' ) , ( 'Honda' , 'Japan' ) , ( 'Hyundai' , 'South Korea' ) , ('Infiniti' , 'Japan') ,( 'Isuzu UTE' , 'Japan' ) ,( 'Jaguar' , 'England' ) ,( 'Jeep' , 'America' ) ,( 'Kia' , 'South Korea ') ,( 'Lamborghini' , 'Italy' ) ,( 'Land Rover' , 'England' ) ,( 'LDV' , 'China' ) ,( 'Lexus' , 'Japan' ) ,( 'Lotus	' , 'England' ) ,( 'Maserati' , 'Italy' ) ,( 'Mazda' , 'Japan' ) ,( 'McLaren' , 'England' ) ,( 'Mercedes-Benz	' , 'Germany' ) ,( 'MG' , 'England' ) ,( 'Mini' , 'England' ) ,( 'Mitsubishi' , 'Japan' ) ,( 'Nissan' , 'Japan' ) ,( 'Opel' , 'Germany' ) ,( 'Peugeot' , 'France' ) ,( 'Porsche' , 'Germany' ) ,( 'Proton' , 'Malaysia' ) ,( 'Renault' , 'France' ) ,( 'Rolls Royce' , 'England' ) ,( 'Saab' , 'Sweden' ) ,( 'ŠKODA	Czech' , 'Republic' ) ,( 'Smart' , 'Germany' ) ,( 'SsangYong' , 'South Korea' ) ,( 'Subaru' , 'Japan' ) ,( 'Suzuki' , 'Japan' ) ,( 'Tesla	' , 'America' ) ,( 'Toyota' , 'Japan' ) ,( 'Volkswagen' , 'Germany' ) ,( 'Volvo' , 'Sweden' ) ,( 'Yamaha' , 'Japan' ) ,( 'Harley davidson'	, 'USA' ) ");
+
     print("onupgrade ========================");
   }
 

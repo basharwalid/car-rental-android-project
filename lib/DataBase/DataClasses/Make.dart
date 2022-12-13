@@ -2,7 +2,7 @@ class Make {
   int MakerID ;
   String MakerName ;
   String OriginCountry ;
-  String Agent ;
+  String? Agent ;
 
   Make ({
     required this.MakerID ,

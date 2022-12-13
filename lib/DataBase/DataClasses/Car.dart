@@ -16,7 +16,7 @@ class Car {
   String TractionType ;
   String FuelTankCapacity ;
   String NumberOfCylinder ;
-  String Price;
+  double Price;
   String Image;
 
   Car ({
@@ -41,6 +41,9 @@ class Car {
     required this.Image,
   });
 }
+
+
+
 
 
 

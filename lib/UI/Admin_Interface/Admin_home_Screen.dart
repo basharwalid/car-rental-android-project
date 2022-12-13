@@ -15,12 +15,10 @@ class AdminHomeScree extends StatefulWidget {
 
 class _AdminHomeScreeState extends State<AdminHomeScree> {
   int curantindex = 0;
-
   var taps = [ShowCarsTap(),ShowEmployeeTap()];
   SQLDB Sqldb =SQLDB();
   @override
   Widget build(BuildContext context) {
-    Sqldb.instialDB();
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -41,7 +39,7 @@ class _AdminHomeScreeState extends State<AdminHomeScree> {
         body: Column(
           children: [
             Expanded(child: taps[curantindex])
-            
+
           ],
         ),
 
@@ -85,4 +83,5 @@ class _AdminHomeScreeState extends State<AdminHomeScree> {
       ),
     );
   }
+
 }

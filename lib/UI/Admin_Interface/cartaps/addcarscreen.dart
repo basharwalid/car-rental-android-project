@@ -1,11 +1,14 @@
 import 'dart:io';
-import 'dart:math';
 import 'dart:core';
 import 'package:app/DataBase/DataClasses/Car.dart';
+import 'package:app/DataBase/DataClasses/Make.dart';
+import 'package:app/DataBase/Database.dart';
+import 'package:app/UI/Admin_Interface/Admin_home_Screen.dart';
 import 'package:app/UI/theme/themedatafile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../DataBase/DataClasses/Department.dart';
 
 class AddCerScreen extends StatefulWidget {
   static const String routeName = 'add car screen' ;
@@ -15,12 +18,14 @@ class AddCerScreen extends StatefulWidget {
 }
 
 class _AddCerScreenState extends State<AddCerScreen> {
+    SQLDB SqlDb = SQLDB();
     Car car =Car(CarID: 0 , DepartmentID: 0 , MakerID: 0 , Color: 'Color', ManufacturCompany: 'ManufacturCompany', CarModel: 'CarModel',
         EngineCapacity: 'EngineCapacity', HorsePower: 'HorsePower', MaximumSpeed: 'MaximumSpeed', TransmissionType: 'TransmissionType', YearModel: 'YearModel', Fuel: 'Fuel', TankSize: 'TankSize',
-        Seats: 'Seats', TractionType: "", FuelTankCapacity: 'FuelTankCapacity', NumberOfCylinder: 'NumberOfCylinder', Price: 'Price', Image: 'Image');
-
+        Seats: 'Seats', TractionType: "", FuelTankCapacity: 'FuelTankCapacity', NumberOfCylinder: 'NumberOfCylinder', Price: 0, Image: 'Image');
     File? image;
     final imagepicker = ImagePicker();
+
+    final formKey = GlobalKey<FormState>();
 
     uploadImage() async {
       // the image in the page
@@ -42,7 +47,6 @@ class _AddCerScreenState extends State<AddCerScreen> {
       'Smart' , 'SsangYong' , 'Subaru' ,  'Suzuki' ,  'Tesla' ,  'Toyota' , 'Volkswagen' , 'Volvo'
     ];
     String Car_Maker = 'All Brands' ;
-
     // the transition type
     final Transmission_Type_List = ['Automatic' , 'Manual'];
     String Transmition_type = 'Automatic' ;
@@ -62,16 +66,14 @@ class _AddCerScreenState extends State<AddCerScreen> {
     final TractionType_list = ['Traction Type' , 'Front Wheel Drive – FWD Meaning' , 'Rear Wheel Drive – RWD Meaning',
       'Four Wheel Drive – 4WD Meaning', 'All-Wheel Drive – AWD Meaning'];
     String TractionType = 'Traction Type' ;
-    // ----------------------------------------
-    // final _formKey = GlobalKey<FormState>();
-    // final TextEditingController _carid = new TextEditingController();
-    // final TextEditingController _Departmentid = new TextEditingController();
-    // final TextEditingController _nameController = new TextEditingController();
-    // final TextEditingController _nameController = new TextEditingController();
+
+    List<Department> departments =[];
+    List<Make> maker =[];
 
   @override
   Widget build(BuildContext context) {
-
+    readDepartmentdata();
+    readMakerdata() ;
     var mediaquery = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
@@ -111,42 +113,44 @@ class _AddCerScreenState extends State<AddCerScreen> {
               child: Container(
 
                 child: Form(
+                  key: formKey,
                   child: ListView(
                     children: [
-                      // car id
-                      Container(
-                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                        child: TextFormField(
-                          keyboardType: const TextInputType.numberWithOptions(decimal: false , signed: false),
-                          inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9.,]')),],
-                          decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide:const  BorderSide( width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10)
-                              ),
-                              label: Text( "Car ID",
-                                style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
-                              ),
-                              contentPadding:const EdgeInsets.symmetric(horizontal: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide:const BorderSide(color: Colors.white, width: 2),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10))),
-                          cursorColor: MyTheme.primarycolor,
-                          validator: validatcarID,
-                          onChanged: (val) {
-                            setState(() {
-                            });
-                          },
-                        ),
-                      ),
+                      // // car id
+                      // Container(
+                      //   margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
+                      //   child: TextFormField(
+                      //     keyboardType: const TextInputType.numberWithOptions(decimal: false , signed: false),
+                      //     inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9.,]')),],
+                      //     decoration: InputDecoration(
+                      //         enabledBorder: OutlineInputBorder(
+                      //             borderSide:const  BorderSide( width: 1, color: MyTheme.primarycolor),
+                      //             borderRadius: BorderRadius.circular(10)
+                      //         ),
+                      //         label: Text( "Car ID",
+                      //           style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
+                      //         ),
+                      //         contentPadding:const EdgeInsets.symmetric(horizontal: 20),
+                      //         border: OutlineInputBorder(
+                      //           borderRadius: BorderRadius.circular(30),
+                      //           borderSide:const BorderSide(color: Colors.white, width: 2),
+                      //         ),
+                      //         focusedBorder: OutlineInputBorder(
+                      //             borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
+                      //             borderRadius: BorderRadius.circular(10))),
+                      //     cursorColor: MyTheme.primarycolor,
+                      //     validator: validatcarID,
+                      //     onChanged: (val) {
+                      //       setState(() {
+                      //       });
+                      //     },
+                      //   ),
+                      // ),
                       // Department ID
                       Container(
                         margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
                         child: TextFormField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
                           inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9.,]')),],
                           decoration: InputDecoration(
@@ -166,7 +170,16 @@ class _AddCerScreenState extends State<AddCerScreen> {
                                   borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                                   borderRadius: BorderRadius.circular(10))),
                           cursorColor: MyTheme.primarycolor,
+                          validator: (value) {
+                              for (int i =0 ; i< departments.length ; i++){
+                                if(departments[i].DepartmentID.toString() == value){
+                                  return null;
+                                }
+                              }
+                              return "invalied Department Id" ;
+                          },
                           onChanged: (val) {
+                            car.DepartmentID = int.parse(val);
                             setState(() {
                             });
                           },
@@ -176,6 +189,7 @@ class _AddCerScreenState extends State<AddCerScreen> {
                       Container(
                         margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
                         child: TextFormField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
                           inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9.,]')),],
                           decoration: InputDecoration(
@@ -195,7 +209,16 @@ class _AddCerScreenState extends State<AddCerScreen> {
                                   borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                                   borderRadius: BorderRadius.circular(10))),
                           cursorColor: MyTheme.primarycolor,
+                          validator: (value) {
+                            for (int i =0 ; i< maker.length ; i++){
+                              if(maker[i].MakerID.toString() == value){
+                                return null;
+                              }
+                            }
+                            return "invalied Department Id" ;
+                          },
                           onChanged: (val) {
+                            car.MakerID = int.parse(val);
                             setState(() {
                             });
                           },
@@ -224,7 +247,11 @@ class _AddCerScreenState extends State<AddCerScreen> {
                                 child: Text(value),
                               );
                             }).toList(),
-                            onChanged: (value) => setState(() {this.Car_Maker = value!;}),
+                            onChanged: (value) => setState(() {
+                                car.ManufacturCompany = value! ;
+                                this.Car_Maker = value!;
+                              }
+                            ),
                           ),
                         ),
                       ),
@@ -232,6 +259,7 @@ class _AddCerScreenState extends State<AddCerScreen> {
                       Container(
                         margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
                         child: TextFormField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                   borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
@@ -249,7 +277,16 @@ class _AddCerScreenState extends State<AddCerScreen> {
                                   borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                                   borderRadius: BorderRadius.circular(10))),
                           cursorColor: MyTheme.primarycolor,
+                          validator: (value) {
+                            if (value == null || value.isEmpty){
+                              return "Invalid Value it Must not be Empty" ;
+                            }
+                            else{
+                              return null;
+                            }
+                          },
                           onChanged: (val) {
+                            car.CarModel = val ;
                             setState(() {
                             });
                           },
@@ -259,6 +296,8 @@ class _AddCerScreenState extends State<AddCerScreen> {
                       Container(
                         margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
                         child: TextFormField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
                           decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                   borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
@@ -276,7 +315,13 @@ class _AddCerScreenState extends State<AddCerScreen> {
                                   borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                                   borderRadius: BorderRadius.circular(10))),
                           cursorColor: MyTheme.primarycolor,
+                          validator: (value) {
+                            if (value == null || value.isEmpty){
+                              return "Invalid Value it Must not be Empty" ;
+                            }
+                          },
                           onChanged: (val) {
+                            car.EngineCapacity = val;
                             setState(() {
                             });
                           },
@@ -286,6 +331,7 @@ class _AddCerScreenState extends State<AddCerScreen> {
                       Container(
                         margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
                         child: TextFormField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                   borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
@@ -303,7 +349,13 @@ class _AddCerScreenState extends State<AddCerScreen> {
                                   borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                                   borderRadius: BorderRadius.circular(10))),
                           cursorColor: MyTheme.primarycolor,
+                          validator: (value) {
+                            if (value == null || value.isEmpty){
+                              return "Invalid Value it Must not be Empty" ;
+                            }
+                          },
                           onChanged: (val) {
+                            car.HorsePower = val;
                             setState(() {
                             });
                           },
@@ -313,6 +365,8 @@ class _AddCerScreenState extends State<AddCerScreen> {
                       Container(
                         margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
                         child: TextFormField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
                           decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                   borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
@@ -330,7 +384,13 @@ class _AddCerScreenState extends State<AddCerScreen> {
                                   borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                                   borderRadius: BorderRadius.circular(10))),
                           cursorColor: MyTheme.primarycolor,
+                          validator: (value) {
+                            if (value == null || value.isEmpty){
+                              return "Invalid Value it Must not be Empty" ;
+                            }
+                          },
                           onChanged: (val) {
+                            car.MaximumSpeed = val;
                             setState(() {
                             });
                           },
@@ -340,6 +400,8 @@ class _AddCerScreenState extends State<AddCerScreen> {
                       Container(
                         margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
                         child: TextFormField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
                           decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                   borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
@@ -357,7 +419,13 @@ class _AddCerScreenState extends State<AddCerScreen> {
                                   borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                                   borderRadius: BorderRadius.circular(10))),
                           cursorColor: MyTheme.primarycolor,
+                          validator: (value) {
+                            if (value == null || value.isEmpty){
+                              return "Invalid Value it Must not be Empty" ;
+                            }
+                          },
                           onChanged: (val) {
+                            car.TankSize = val;
                             setState(() {
                             });
                           },
@@ -386,7 +454,10 @@ class _AddCerScreenState extends State<AddCerScreen> {
                                 child: Text(value),
                               );
                             }).toList(),
-                            onChanged: (value) => setState(() {this.Transmition_type = value!;}),
+                            onChanged: (value) => setState(() {
+                              car.TransmissionType = value! ;
+                              this.Transmition_type = value!;
+                            }),
                           ),
                         ),
                       ),
@@ -413,7 +484,10 @@ class _AddCerScreenState extends State<AddCerScreen> {
                                 child: Text(value),
                               );
                             }).toList(),
-                            onChanged: (value) => setState(() {this.Year = value!;}),
+                            onChanged: (value) => setState(() {
+                              car.YearModel = value!;
+                              this.Year = value!;
+                            }),
                           ),
                         ),
                       ),
@@ -440,7 +514,10 @@ class _AddCerScreenState extends State<AddCerScreen> {
                                 child: Text(value),
                               );
                             }).toList(),
-                            onChanged: (value) => setState(() {this.Fual= value!;}),
+                            onChanged: (value) => setState(() {
+                              car.Fuel = value!;
+                              this.Fual= value!;
+                            }),
                           ),
                         ),
                       ),
@@ -467,7 +544,10 @@ class _AddCerScreenState extends State<AddCerScreen> {
                                 child: Text(value),
                               );
                             }).toList(),
-                            onChanged: (value) => setState(() {this.Seats= value!;}),
+                            onChanged: (value) => setState(() {
+                              car.Seats = value!;
+                              this.Seats= value!;
+                            }),
                           ),
                         ),
                       ),
@@ -494,7 +574,10 @@ class _AddCerScreenState extends State<AddCerScreen> {
                                 child: Text(value),
                               );
                             }).toList(),
-                            onChanged: (value) => setState(() {this.TractionType = value!;}),
+                            onChanged: (value) => setState(() {
+                              car.TractionType = value!;
+                              this.TractionType = value!;
+                            }),
                           ),
                         ),
                       ),
@@ -502,6 +585,8 @@ class _AddCerScreenState extends State<AddCerScreen> {
                       Container(
                         margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
                         child: TextFormField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
                           decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                   borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
@@ -519,7 +604,13 @@ class _AddCerScreenState extends State<AddCerScreen> {
                                   borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                                   borderRadius: BorderRadius.circular(10))),
                           cursorColor: MyTheme.primarycolor,
+                          validator: (value) {
+                            if (value == null || value.isEmpty){
+                              return "Invalid Value it Must not be Empty" ;
+                            }
+                          },
                           onChanged: (val) {
+                            car.FuelTankCapacity = val;
                             setState(() {
                             });
                           },
@@ -529,6 +620,8 @@ class _AddCerScreenState extends State<AddCerScreen> {
                       Container(
                         margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
                         child: TextFormField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
                           decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                   borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
@@ -546,16 +639,24 @@ class _AddCerScreenState extends State<AddCerScreen> {
                                   borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                                   borderRadius: BorderRadius.circular(10))),
                           cursorColor: MyTheme.primarycolor,
+                          validator: (value) {
+                            if (value == null || value.isEmpty){
+                              return "Invalid Value it Must not be Empty" ;
+                            }
+                          },
                           onChanged: (val) {
+                            car.NumberOfCylinder = val;
                             setState(() {
                             });
                           },
                         ),
                       ),
-                      // NumberOfCylinder
+                      // price
                       Container(
                         margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
                         child: TextFormField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
                           decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                   borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
@@ -573,10 +674,36 @@ class _AddCerScreenState extends State<AddCerScreen> {
                                   borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                                   borderRadius: BorderRadius.circular(10))),
                           cursorColor: MyTheme.primarycolor,
+                          validator: (value) {
+                            if (value == null || value.isEmpty){
+                              return "Invalid Value it Must not be Empty" ;
+                            }
+                          },
                           onChanged: (val) {
+                            car.Price = double.parse(val);
                             setState(() {
                             });
                           },
+                        ),
+                      ),
+                      Container(
+                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
+                        child: ElevatedButton(
+                          onPressed: (){
+                            final isvalidform = formKey.currentState!.validate();
+                            if( isvalidform ){
+                              // SqlDb.insertData(sql);
+                              Navigator.pushNamed(context, AdminHomeScree.routeName,arguments: car);
+                            }
+                          },
+                          child: Text("Add Car",style: Theme.of(context).textTheme.headline2?.copyWith(fontSize: 24,fontWeight: FontWeight.w500),),
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).primaryColor,
+                              padding: const EdgeInsets.all(10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(200),
+                              )
+                          ),
                         ),
                       ),
                     ],
@@ -584,24 +711,33 @@ class _AddCerScreenState extends State<AddCerScreen> {
                 ),
               )
           )
+
         ],
       ),
     );
   }
 
-  // validation funcrions
-  String? validatcarID (String? value){
-    if (value == null || value.isEmpty || value.trim().isEmpty||value.contains(".")||value.contains(",")){
-      setState(() {
-
+    readDepartmentdata ()async{
+      List<Map<String , dynamic>> response = await SqlDb.readData("SELECT * FROM 'Department'");
+      departments = List.generate(response.length, (index) {
+        return Department(
+          DepartmentID: response[index]['DepartmentID'],
+          DepartmentName: response[index]['DepartmentName'],
+          DepartmentLocation: response[index]['DepartmentLocation'],
+          DepartmentStartDate: response[index]['DepartmentStartDate'],
+        );
       });
-      return "Invalid Car ID" ;
     }
-    else {
-      setState(() {
 
+    readMakerdata ()async{
+      List<Map<String , dynamic>> response = await SqlDb.readData("SELECT * FROM 'Make'");
+      maker = List.generate(response.length, (index) {
+        return Make(
+          MakerID: response[index]['MakerID'],
+          MakerName: response[index]['MakerName'],
+          OriginCountry: response[index]['OriginCountry'],
+          Agent: response[index]['Agent']
+        );
       });
-      return null;
     }
-  }
 }
