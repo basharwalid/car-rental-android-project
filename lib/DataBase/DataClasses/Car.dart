@@ -1,7 +1,7 @@
 class Car {
-  int CarID ;
-  int DepartmentID ;
-  int MakerID ;
+  int    CarID ;
+  int    DepartmentID ;
+  int    MakerID ;
   String Color ;
   String ManufacturCompany ;
   String CarModel ;

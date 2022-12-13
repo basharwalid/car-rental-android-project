@@ -154,6 +154,9 @@ class SQLDB {
     ''');
     print ("Create Rent Table \n  ==================================================");
 
+    print ("Implementd Daepartment Data \n  ==================================================");
+
+
   }
 
   readData(String sql) async{
