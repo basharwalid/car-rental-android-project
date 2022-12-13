@@ -39,7 +39,6 @@ class _AdminHomeScreeState extends State<AdminHomeScree> {
         body: Column(
           children: [
             Expanded(child: taps[curantindex])
-
           ],
         ),
 

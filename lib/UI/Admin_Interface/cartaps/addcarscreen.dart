@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'dart:io';
 import 'dart:core';
 import 'package:app/DataBase/DataClasses/Car.dart';
@@ -24,14 +26,18 @@ class _AddCerScreenState extends State<AddCerScreen> {
         Seats: 'Seats', TractionType: "", FuelTankCapacity: 'FuelTankCapacity', NumberOfCylinder: 'NumberOfCylinder', Price: 0, Image: 'Image');
     File? image;
     final imagepicker = ImagePicker();
+    Uint8List? bytes;
+    String? img64 ;
 
     final formKey = GlobalKey<FormState>();
 
     uploadImage() async {
       // the image in the page
-      XFile? pickedImage = await imagepicker.pickImage(source: ImageSource.camera);
+      XFile? pickedImage = await imagepicker.pickImage(source: ImageSource.gallery);
       if (pickedImage == null) return;
       image = File(pickedImage.path);
+      bytes = File(image!.path).readAsBytesSync();
+      img64 = base64Encode(bytes!);
       setState(() {
 
       });
@@ -102,7 +108,8 @@ class _AddCerScreenState extends State<AddCerScreen> {
                   child:image == null? Icon(Icons.camera_alt_rounded , color: MyTheme.white, size: 40,):Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      image: DecorationImage(image: FileImage(image! ),fit: BoxFit.cover),
+                      image: DecorationImage(image: FileImage(image! ),fit: BoxFit.contain),
+                      color: Colors.transparent,
                     ),
                   )
                 ),
@@ -116,36 +123,43 @@ class _AddCerScreenState extends State<AddCerScreen> {
                   key: formKey,
                   child: ListView(
                     children: [
-                      // // car id
-                      // Container(
-                      //   margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                      //   child: TextFormField(
-                      //     keyboardType: const TextInputType.numberWithOptions(decimal: false , signed: false),
-                      //     inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9.,]')),],
-                      //     decoration: InputDecoration(
-                      //         enabledBorder: OutlineInputBorder(
-                      //             borderSide:const  BorderSide( width: 1, color: MyTheme.primarycolor),
-                      //             borderRadius: BorderRadius.circular(10)
-                      //         ),
-                      //         label: Text( "Car ID",
-                      //           style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
-                      //         ),
-                      //         contentPadding:const EdgeInsets.symmetric(horizontal: 20),
-                      //         border: OutlineInputBorder(
-                      //           borderRadius: BorderRadius.circular(30),
-                      //           borderSide:const BorderSide(color: Colors.white, width: 2),
-                      //         ),
-                      //         focusedBorder: OutlineInputBorder(
-                      //             borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
-                      //             borderRadius: BorderRadius.circular(10))),
-                      //     cursorColor: MyTheme.primarycolor,
-                      //     validator: validatcarID,
-                      //     onChanged: (val) {
-                      //       setState(() {
-                      //       });
-                      //     },
-                      //   ),
-                      // ),
+                      // Color
+                      Container(
+                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
+                        child: TextFormField(
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
+                                  borderRadius: BorderRadius.circular(10)
+                              ),
+                              label: Text( "Color",
+                                style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
+                              ),
+                              contentPadding:const EdgeInsets.symmetric(horizontal: 20),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                                borderSide:const BorderSide(color: Colors.white, width: 2),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
+                                  borderRadius: BorderRadius.circular(10))),
+                          cursorColor: MyTheme.primarycolor,
+                          validator: (value) {
+                            if (value == null || value.isEmpty){
+                              return "Invalid Value it Must not be Empty" ;
+                            }
+                            else{
+                              return null;
+                            }
+                          },
+                          onChanged: (val) {
+                            car.Color = val;
+                            setState(() {
+                            });
+                          },
+                        ),
+                      ),
                       // Department ID
                       Container(
                         margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
@@ -692,7 +706,7 @@ class _AddCerScreenState extends State<AddCerScreen> {
                           onPressed: (){
                             final isvalidform = formKey.currentState!.validate();
                             if( isvalidform ){
-                              // SqlDb.insertData(sql);
+                              SqlDb.insertData("INSERT INTO 'Car' ('Color' , 'DepartmentID' , 'MakerID' , 'ManufacturCompany' , 'CarModel' , 'EngineCapacity' , 'HorsePower' , 'MaximumSpeed' , 'TransmissionType' ,'YearModel' , 'Fuel' ,'TankSize' , 'Seats' , 'TractionType' , 'FuelTankCapacity' , 'NumberOfCylinder' , 'Price' , 'Image') VALUES ('${car.Color}', '${car.DepartmentID}','${car.MakerID}', '${car.ManufacturCompany}','${car.CarModel}', '${car.EngineCapacity}', '${car.HorsePower}', '${car.MaximumSpeed}', '${car.TransmissionType}', '${car.YearModel}', '${car.Fuel}', '${car.TankSize}', '${car.Seats}', '${car.TractionType}', '${car.FuelTankCapacity}', '${car.NumberOfCylinder}', '${car.Price}', '${img64}')");
                               Navigator.pushNamed(context, AdminHomeScree.routeName,arguments: car);
                             }
                           },
@@ -737,6 +751,35 @@ class _AddCerScreenState extends State<AddCerScreen> {
           MakerName: response[index]['MakerName'],
           OriginCountry: response[index]['OriginCountry'],
           Agent: response[index]['Agent']
+        );
+      });
+    }
+
+    List<Car> cars = [];
+
+    readCardata ()async{
+      List<Map<String , dynamic>> response = await SqlDb.readData("SELECT * FROM 'Car'");
+      cars = List.generate(response.length, (index) {
+        return Car(
+            MakerID: response[index]['MakerID'],
+            CarID: response[index]['CarID'],
+            CarModel: response[index]['CarModel'],
+            Color: response[index]['Color'],
+            DepartmentID: response[index]['DepartmentID'],
+            EngineCapacity: response[index]['EngineCapacity'],
+            Fuel: response[index]['Fuel'],
+            FuelTankCapacity: response[index]['FuelTankCapacity'],
+            HorsePower: response[index]['HorsePower'],
+            ManufacturCompany: response[index]['ManufacturCompany'],
+            Image:  response[index]['Image'],
+            MaximumSpeed:   response[index]['MaximumSpeed'],
+            NumberOfCylinder: response[index]['NumberOfCylinder'],
+            Price: response[index]['Price'],
+            Seats: response[index]['Seats'],
+            TankSize: response[index]['TankSize'],
+            TractionType: response[index]['TractionType'],
+            TransmissionType:  response[index]['TransmissionType'],
+            YearModel:  response[index]['YearModel'],
         );
       });
     }
