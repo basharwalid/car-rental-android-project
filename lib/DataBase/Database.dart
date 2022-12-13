@@ -70,6 +70,7 @@ class SQLDB {
       FuelTankCapacity TEXT NOT NULL , 
       NumberOfCylinder TEXT NOT NULL , 
       Price REAL NOT NULL ,
+      Image Text NOT NULL , 
     
       PRIMARY KEY (CarID) ,
       FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID) ,
@@ -90,6 +91,7 @@ class SQLDB {
       City TEXT NOT NULL , 
       Country TEXT NOT NULL , 
       Nationalty TEXT NOT NULL ,
+      Image Text NOT NULL ,
     
       PRIMARY KEY (BorrowerID) 
     )
@@ -114,6 +116,7 @@ class SQLDB {
       EmployeeSalary TEXT NOT NULL , 
       EmployeeBankingInforamtion TEXT NOT NULL ,
       EmployeeGraduationState TEXT NOT NULL ,
+      Image Text NOT NULL ,
     
       PRIMARY KEY (EmployeeID),
       FOREIGN KEY (EmployeeDepartment) REFERENCES Department(DepartmentID) ON DELETE CASCADE ON UPDATE CASCADE 
