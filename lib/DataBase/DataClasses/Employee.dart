@@ -13,7 +13,7 @@ class Employee {
   String EmployeeCity ;
   String EmployeeAddress ;
   String EmployeeNationality ;
-  String EmployeeSalary ;
+  double EmployeeSalary ;
   String EmployeeBankingInforamtion ;
   String EmployeeGraduationState ;
   String Image ;

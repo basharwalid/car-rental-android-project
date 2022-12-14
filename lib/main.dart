@@ -1,3 +1,5 @@
+import 'package:app/UI/Admin_Interface/cartaps/editdataofthecar.dart';
+import 'package:app/UI/Admin_Interface/employeetaps/addEmployee.dart';
 import 'package:flutter/material.dart';
 import 'UI/Admin_Interface/Admin_home_Screen.dart';
 import 'UI/Admin_Interface/cartaps/addcarscreen.dart';
@@ -13,6 +15,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       routes:{
+        AddEmployeeSCreen.routeName :(_) => AddEmployeeSCreen(),
+        editCerScreen.routeName :(_) => editCerScreen(),
         AdminHomeScree.routeName : (_) => AdminHomeScree(),
         AddCerScreen.routeName :(_) => AddCerScreen(),
       } ,

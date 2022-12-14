@@ -2,6 +2,7 @@ import 'package:app/DataBase/Database.dart';
 import 'package:app/UI/Admin_Interface/cartaps/ShowCarsTap.dart';
 import 'package:app/UI/Admin_Interface/cartaps/addcarscreen.dart';
 import 'package:app/UI/Admin_Interface/employeetaps/Show_Emplyoee_Tap.dart';
+import 'package:app/UI/Admin_Interface/employeetaps/addEmployee.dart';
 import 'package:app/UI/theme/themedatafile.dart';
 import 'package:flutter/material.dart';
 
@@ -53,7 +54,7 @@ class _AdminHomeScreeState extends State<AdminHomeScree> {
               if (curantindex == 0 ){
                 Navigator.pushNamed(context, AddCerScreen.routeName);
               }else{
-
+                Navigator.pushNamed(context, AddEmployeeSCreen.routeName);
               }
             },
             child: Icon(Icons.add_rounded , size: 36, color: MyTheme.white,),

@@ -1,16 +1,34 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'dart:typed_data';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io' as io ;
+
 class SQLDB {
 
   static Database? _db;
 
   Future<Database?> get db async {
     if (_db == null){
-      _db  = await instialDB() ;
+      _db  = await initdb() ;
       return _db ;
     }else {
       return _db ;
     }
+  }
+  initdb()async{
+    io.Directory car_rental_project = await getApplicationDocumentsDirectory();
+    String path = join(car_rental_project.path , 'Car Rental System DataBase.db');
+    bool dbexist = await io.File(path).exists();
+    if (!dbexist) {
+      ByteData data = await rootBundle.load(join("assets","Car Rental System DataBase.db"));
+      List<int> bytes = data.buffer.asUint8List(data.offsetInBytes , data.lengthInBytes);
+      await io.File(path).writeAsBytes(bytes , flush: true);
+    }
+
+    var theDB = await openDatabase(path , version: 1);
+    return theDB;
   }
 
   instialDB() async {
@@ -128,17 +146,17 @@ class SQLDB {
     ''');
     print ("Create Employee Table \n  ==================================================");
     await db.execute('''
-    CREATE TABLE Reservation (
-      ReservationID INTEGER NOT NULL , 
-      CarId INTEGER NOT NULL ,
-      DepartmentID INTEGER NOT NULL ,
-      BorroweID INTEGER NOT NULL ,
-    
-      PRIMARY KEY (ReservationID),
-      FOREIGN KEY (CarId) REFERENCES Car(CarID),
-      FOREIGN KEY (BorroweID) REFERENCES Borrower(BorrowerID),
-      FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID)
-    )
+      CREATE TABLE Reservation (
+        ReservationID INTEGER NOT NULL , 
+        CarId INTEGER NOT NULL ,
+        DepartmentID INTEGER NOT NULL ,
+        BorroweID INTEGER NOT NULL ,
+      
+        PRIMARY KEY (ReservationID),
+        FOREIGN KEY (CarId) REFERENCES Car(CarID),
+        FOREIGN KEY (BorroweID) REFERENCES Borrower(BorrowerID),
+        FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID)
+      )
     ''');
     print ("Create Reservation Table \n  ==================================================");
     await db.execute('''

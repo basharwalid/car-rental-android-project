@@ -1,90 +1,86 @@
 import 'dart:convert';
-
 import 'dart:io';
-import 'dart:core';
-import 'package:app/DataBase/DataClasses/Car.dart';
-import 'package:app/DataBase/DataClasses/Make.dart';
-import 'package:app/DataBase/Database.dart';
-import 'package:app/UI/Admin_Interface/Admin_home_Screen.dart';
-import 'package:app/UI/theme/themedatafile.dart';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../DataBase/DataClasses/Car.dart';
 import '../../../DataBase/DataClasses/Department.dart';
+import '../../../DataBase/DataClasses/Make.dart';
+import '../../../DataBase/Database.dart';
+import '../../theme/themedatafile.dart';
 
-class AddCerScreen extends StatefulWidget {
-  static const String routeName = 'add car screen' ;
+class editCerScreen extends StatefulWidget {
+  static const String routeName = 'edit car screen' ;
 
   @override
-  State<AddCerScreen> createState() => _AddCerScreenState();
+  State<editCerScreen> createState() => _editCerScreenState();
 }
 
-class _AddCerScreenState extends State<AddCerScreen> {
-    Car car =Car(CarID: 0 , DepartmentID: 0 , MakerID: 0 , Color: 'Color', ManufacturCompany: 'ManufacturCompany', CarModel: 'CarModel',
-        EngineCapacity: 'EngineCapacity', HorsePower: 'HorsePower', MaximumSpeed: 'MaximumSpeed', TransmissionType: 'TransmissionType', YearModel: 'YearModel', Fuel: 'Fuel', TankSize: 'TankSize',
-        Seats: 'Seats', TractionType: "", FuelTankCapacity: 'FuelTankCapacity', NumberOfCylinder: 'NumberOfCylinder', Price: 0, Image: 'Image');
-    SQLDB SqlDb = SQLDB();
+class _editCerScreenState extends State<editCerScreen> {
+  SQLDB SqlDb = SQLDB();
 
-    File? image;
-    final imagepicker = ImagePicker();
-    Uint8List? bytes;
-    String? img64 ;
+  File? image;
+  final imagepicker = ImagePicker();
+  Uint8List? bytes;
+  String? img64 ;
 
-    final formKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
 
-    uploadImage() async {
-      // the image in the page
-      XFile? pickedImage = await imagepicker.pickImage(source: ImageSource.gallery);
-      if (pickedImage == null) return;
-      image = File(pickedImage.path);
-      bytes = File(image!.path).readAsBytesSync();
-      img64 = base64Encode(bytes!);
-      setState(() {
+  uploadImage() async {
+    // the image in the page
+    XFile? pickedImage = await imagepicker.pickImage(source: ImageSource.gallery);
+    if (pickedImage == null) return;
+    image = File(pickedImage.path);
+    bytes = File(image!.path).readAsBytesSync();
+    img64 = base64Encode(bytes!);
+    setState(() {
 
-      });
-    }
-    // cars list
-    final Car_makers_name_list = [
-      'All Brands' , 'Abarth' , 'Alfa Romeo' , 'Aston Martin' , 'Audi' , 'Bentley' ,
-      'BMW' , 'Bugatti' , 'Cadillac' , 'Caterham' , 'Chery' , 'Chevrolet' , 'Chrysler' , 'Citroen' , 'Daewoo' , 'Daihatsu' ,
-      'Datsun' , 'Dodge' , 'Ferrari' , 'Fiat' , 'Ford' , 'Genesis' , 'Great Wall' , 'Haval' , 'Holden' , 'Honda' ,
-      'Hyundai' , 'Infiniti' , 'Isuzu UTE' , 'Jaguar' , 'Jeep' , 'Kia' , 'Lamborghini' , 'Land Rover' , 'LDV' ,
-      'Lexus' , 'Lotus' , 'Maserati' , 'Mazda' , 'McLaren' , 'Mercedes-Benz' , 'MG' , 'Mini' , 'Mitsubishi' ,
-      'Nissan' , 'Opel' , 'Peugeot' , 'Porsche' , 'Proton' , 'Renault' , 'Rolls Royce' , 'Saab' , 'ŠKODA' ,
-      'Smart' , 'SsangYong' , 'Subaru' ,  'Suzuki' ,  'Tesla' ,  'Toyota' , 'Volkswagen' , 'Volvo'
-    ];
-    String Car_Maker = 'All Brands' ;
-    // the transition type
-    final Transmission_Type_List = ['Automatic' , 'Manual'];
-    String Transmition_type = 'Automatic' ;
-    // the transition type
-    final Year_List = ['Year' , '2000' , '2001', '2002', '2003', '2004' , '2005', '2006', '2007', '2008'
-      , '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020'
-      , '2021', '2022'
-    ];
-    String Year = 'Year' ;
-    // the transition type
-    final Fual_list = ['Fual Type' , 'Kerosene' , 'Solar Oil', 'Diesel Oil', 'Fuel Oil', 'Biodiesel' , 'Gasoline' ];
-    String Fual = 'Fual Type' ;
-    // the transition type
-    final Seats_list = ['Seats' , '2' , '3', '4', '5', '6' , '7' ];
-    String Seats = 'Seats' ;
-    // the transition type
-    final TractionType_list = ['Traction Type' , 'Front Wheel Drive – FWD Meaning' , 'Rear Wheel Drive – RWD Meaning',
-      'Four Wheel Drive – 4WD Meaning', 'All-Wheel Drive – AWD Meaning'];
-    String TractionType = 'Traction Type' ;
+    });
+  }
+  // cars list
+  final Car_makers_name_list = [
+    'All Brands' , 'Abarth' , 'Alfa Romeo' , 'Aston Martin' , 'Audi' , 'Bentley' ,
+    'BMW' , 'Bugatti' , 'Cadillac' , 'Caterham' , 'Chery' , 'Chevrolet' , 'Chrysler' , 'Citroen' , 'Daewoo' , 'Daihatsu' ,
+    'Datsun' , 'Dodge' , 'Ferrari' , 'Fiat' , 'Ford' , 'Genesis' , 'Great Wall' , 'Haval' , 'Holden' , 'Honda' ,
+    'Hyundai' , 'Infiniti' , 'Isuzu UTE' , 'Jaguar' , 'Jeep' , 'Kia' , 'Lamborghini' , 'Land Rover' , 'LDV' ,
+    'Lexus' , 'Lotus' , 'Maserati' , 'Mazda' , 'McLaren' , 'Mercedes-Benz' , 'MG' , 'Mini' , 'Mitsubishi' ,
+    'Nissan' , 'Opel' , 'Peugeot' , 'Porsche' , 'Proton' , 'Renault' , 'Rolls Royce' , 'Saab' , 'ŠKODA' ,
+    'Smart' , 'SsangYong' , 'Subaru' ,  'Suzuki' ,  'Tesla' ,  'Toyota' , 'Volkswagen' , 'Volvo'
+  ];
+  String Car_Maker = 'All Brands' ;
+  // the transition type
+  final Transmission_Type_List = ['Automatic' , 'Manual'];
+  String Transmition_type = 'Automatic' ;
+  // the transition type
+  final Year_List = ['Year' , '2000' , '2001', '2002', '2003', '2004' , '2005', '2006', '2007', '2008'
+    , '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020'
+    , '2021', '2022'
+  ];
+  String Year = 'Year' ;
+  // the transition type
+  final Fual_list = ['Fual Type' , 'Kerosene' , 'Solar Oil', 'Diesel Oil', 'Fuel Oil', 'Biodiesel' , 'Gasoline' ];
+  String Fual = 'Fual Type' ;
+  // the transition type
+  final Seats_list = ['Seats' , '2' , '3', '4', '5', '6' , '7' ];
+  String Seats = 'Seats' ;
+  // the transition type
+  final TractionType_list = ['Traction Type' , 'Front Wheel Drive – FWD Meaning' , 'Rear Wheel Drive – RWD Meaning',
+    'Four Wheel Drive – 4WD Meaning', 'All-Wheel Drive – AWD Meaning'];
+  String TractionType = 'Traction Type' ;
 
-    List<Department> departments =[];
-    List<Make> maker =[];
+  List<Department> departments =[];
+  List<Make> maker =[];
 
   @override
   Widget build(BuildContext context) {
     readDepartmentdata();
     readMakerdata() ;
     var mediaquery = MediaQuery.of(context).size;
+    Car car = ModalRoute.of(context)?.settings.arguments as Car ;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Enter The New Car Data"),
+        title: Text("Edit Car Screen"),
       ),
       body: Column(
         children: [
@@ -100,19 +96,19 @@ class _AddCerScreenState extends State<AddCerScreen> {
                 borderRadius: BorderRadius.circular(100000),
                 onTap: uploadImage,
                 child: Container(
-                  decoration:const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: MyTheme.primarycolor,
-                  ),
-                  height: mediaquery.height*0.25,
-                  width: mediaquery.width,
-                  child:image == null? Icon(Icons.camera_alt_rounded , color: MyTheme.white, size: 40,):Container(
-                    decoration: BoxDecoration(
+                    decoration:const BoxDecoration(
                       shape: BoxShape.circle,
-                      image: DecorationImage(image: FileImage(image! ),fit: BoxFit.contain),
-                      color: Colors.transparent,
+                      color: MyTheme.primarycolor,
                     ),
-                  )
+                    height: mediaquery.height*0.25,
+                    width: mediaquery.width,
+                    child:image == null? Icon(Icons.camera_alt_rounded , color: MyTheme.white, size: 40,):Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(image: FileImage(image! ),fit: BoxFit.contain),
+                        color: Colors.transparent,
+                      ),
+                    )
                 ),
               ),
             ),
@@ -186,12 +182,12 @@ class _AddCerScreenState extends State<AddCerScreen> {
                                   borderRadius: BorderRadius.circular(10))),
                           cursorColor: MyTheme.primarycolor,
                           validator: (value) {
-                              for (int i =0 ; i< departments.length ; i++){
-                                if(departments[i].DepartmentID.toString() == value){
-                                  return null;
-                                }
+                            for (int i =0 ; i< departments.length ; i++){
+                              if(departments[i].DepartmentID.toString() == value){
+                                return null;
                               }
-                              return "invalied Department Id" ;
+                            }
+                            return "invalied Department Id" ;
                           },
                           onChanged: (val) {
                             car.DepartmentID = int.parse(val);
@@ -263,9 +259,9 @@ class _AddCerScreenState extends State<AddCerScreen> {
                               );
                             }).toList(),
                             onChanged: (value) => setState(() {
-                                car.ManufacturCompany = value! ;
-                                this.Car_Maker = value!;
-                              }
+                              car.ManufacturCompany = value! ;
+                              this.Car_Maker = value!;
+                            }
                             ),
                           ),
                         ),
@@ -706,12 +702,14 @@ class _AddCerScreenState extends State<AddCerScreen> {
                         child: ElevatedButton(
                           onPressed: (){
                             final isvalidform = formKey.currentState!.validate();
+                            print('${car.CarID}');
+                            print('$car');
                             if( isvalidform ){
-                              SqlDb.insertData("INSERT INTO 'Car' ('Color' , 'DepartmentID' , 'MakerID' , 'ManufacturCompany' , 'CarModel' , 'EngineCapacity' , 'HorsePower' , 'MaximumSpeed' , 'TransmissionType' ,'YearModel' , 'Fuel' ,'TankSize' , 'Seats' , 'TractionType' , 'FuelTankCapacity' , 'NumberOfCylinder' , 'Price' , 'Image') VALUES ('${car.Color}', '${car.DepartmentID}','${car.MakerID}', '${car.ManufacturCompany}','${car.CarModel}', '${car.EngineCapacity}', '${car.HorsePower}', '${car.MaximumSpeed}', '${car.TransmissionType}', '${car.YearModel}', '${car.Fuel}', '${car.TankSize}', '${car.Seats}', '${car.TractionType}', '${car.FuelTankCapacity}', '${car.NumberOfCylinder}', '${car.Price}', '${img64}')");
+                              SqlDb.updateData("UPDATE 'Car' SET 'Color' = '${car.Color}' , 'DepartmentID' = '${car.DepartmentID}' , 'MakerID' = '${car.MakerID}', 'ManufacturCompany' = '${car.ManufacturCompany}', 'CarModel' ='${car.CarModel}', 'EngineCapacity'='${car.EngineCapacity}' , 'HorsePower'='${car.HorsePower}' , 'MaximumSpeed'='${car.MaximumSpeed}' , 'TransmissionType'='${car.TransmissionType}' ,'YearModel'='${car.YearModel}' , 'Fuel'='${car.Fuel}' ,'TankSize' ='${car.TankSize}', 'Seats'='${car.Seats}' , 'TractionType'='${car.TractionType}' , 'FuelTankCapacity'='${car.FuelTankCapacity}', 'NumberOfCylinder'= '${car.NumberOfCylinder}' , 'Price'='${car.Price}' , 'Image' = '${img64}' WHERE 'CarID'=${car.CarID} ");
                               Navigator.pop(context);
                             }
                           },
-                          child: Text("Add Car",style: Theme.of(context).textTheme.headline2?.copyWith(fontSize: 24,fontWeight: FontWeight.w500),),
+                          child: Text("Edit Car",style: Theme.of(context).textTheme.headline2?.copyWith(fontSize: 24,fontWeight: FontWeight.w500),),
                           style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(context).primaryColor,
                               padding: const EdgeInsets.all(10),
@@ -731,57 +729,28 @@ class _AddCerScreenState extends State<AddCerScreen> {
       ),
     );
   }
+  readDepartmentdata ()async{
+    List<Map<String , dynamic>> response = await SqlDb.readData("SELECT * FROM 'Department'");
+    departments = List.generate(response.length, (index) {
+      return Department(
+        DepartmentID: response[index]['DepartmentID'],
+        DepartmentName: response[index]['DepartmentName'],
+        DepartmentLocation: response[index]['DepartmentLocation'],
+        DepartmentStartDate: response[index]['DepartmentStartDate'],
+      );
+    });
+  }
 
-    readDepartmentdata ()async{
-      List<Map<String , dynamic>> response = await SqlDb.readData("SELECT * FROM 'Department'");
-      departments = List.generate(response.length, (index) {
-        return Department(
-          DepartmentID: response[index]['DepartmentID'],
-          DepartmentName: response[index]['DepartmentName'],
-          DepartmentLocation: response[index]['DepartmentLocation'],
-          DepartmentStartDate: response[index]['DepartmentStartDate'],
-        );
-      });
-    }
-
-    readMakerdata ()async{
-      List<Map<String , dynamic>> response = await SqlDb.readData("SELECT * FROM 'Make'");
-      maker = List.generate(response.length, (index) {
-        return Make(
+  readMakerdata ()async{
+    List<Map<String , dynamic>> response = await SqlDb.readData("SELECT * FROM 'Make'");
+    maker = List.generate(response.length, (index) {
+      return Make(
           MakerID: response[index]['MakerID'],
           MakerName: response[index]['MakerName'],
           OriginCountry: response[index]['OriginCountry'],
           Agent: response[index]['Agent']
-        );
-      });
-    }
+      );
+    });
+  }
 
-    List<Car> cars = [];
-
-    readCardata ()async{
-      List<Map<String , dynamic>> response = await SqlDb.readData("SELECT * FROM 'Car'");
-      cars = List.generate(response.length, (index) {
-        return Car(
-            MakerID: response[index]['MakerID'],
-            CarID: response[index]['CarID'],
-            CarModel: response[index]['CarModel'],
-            Color: response[index]['Color'],
-            DepartmentID: response[index]['DepartmentID'],
-            EngineCapacity: response[index]['EngineCapacity'],
-            Fuel: response[index]['Fuel'],
-            FuelTankCapacity: response[index]['FuelTankCapacity'],
-            HorsePower: response[index]['HorsePower'],
-            ManufacturCompany: response[index]['ManufacturCompany'],
-            Image:  response[index]['Image'],
-            MaximumSpeed:   response[index]['MaximumSpeed'],
-            NumberOfCylinder: response[index]['NumberOfCylinder'],
-            Price: response[index]['Price'],
-            Seats: response[index]['Seats'],
-            TankSize: response[index]['TankSize'],
-            TractionType: response[index]['TractionType'],
-            TransmissionType:  response[index]['TransmissionType'],
-            YearModel:  response[index]['YearModel'],
-        );
-      });
-    }
 }
