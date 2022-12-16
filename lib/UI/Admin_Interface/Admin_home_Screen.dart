@@ -57,12 +57,12 @@ class _AdminHomeScreeState extends State<AdminHomeScree> {
                 Navigator.pushNamed(context, AddEmployeeSCreen.routeName);
               }
             },
-            child: Icon(Icons.add_rounded , size: 36, color: MyTheme.white,),
+            child:const Icon(Icons.add_rounded , size: 36, color: MyTheme.white,),
           ),
         ),
 
         bottomNavigationBar: BottomAppBar(
-          shape: CircularNotchedRectangle(),
+          shape: const CircularNotchedRectangle(),
           notchMargin: 12,
           color: MyTheme.white,
           child: BottomNavigationBar(
@@ -74,7 +74,7 @@ class _AdminHomeScreeState extends State<AdminHomeScree> {
               setState(() {
               });
             },
-            items: [
+            items:const [
               BottomNavigationBarItem(icon: Icon(Icons.car_rental_rounded) , label: ""),
               BottomNavigationBarItem(icon: Icon(Icons.person_rounded) , label: ""),
             ],
