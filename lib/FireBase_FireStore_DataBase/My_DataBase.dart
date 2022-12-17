@@ -17,4 +17,20 @@ class  MyDataBase {
     car.CarID = doc.id ;
     return doc.set(car);
   }
+
+  static Future<List<Car>> getCarsData() async{
+    var snapshot = await getCarCollection().get();
+    var list = snapshot.docs.map((doc) => doc.data()).toList();
+    return list;
+  }
+
+  static deletecar(Car car) async{
+    var cardoc = getCarCollection().doc(car.CarID);
+    return cardoc.delete();
+  }
+
+  static updatecar(Car car) async {
+    var cardoc = getCarCollection().doc(car.CarID);
+    var ref = cardoc.update(car.toFireStore());
+  }
 }

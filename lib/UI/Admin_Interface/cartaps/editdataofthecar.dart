@@ -1,42 +1,38 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
+import 'package:app/FireBase_FireStore_DataBase/My_DataBase.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../DataBase/DataClasses/Car.dart';
-import '../../../DataBase/DataClasses/Department.dart';
-import '../../../DataBase/DataClasses/Make.dart';
-import '../../../DataBase/Database.dart';
+import '../../../FireBase_FireStore_DataBase/car/car.dart';
+import '../../../utils/Dialogs_utils_class.dart';
 import '../../theme/themedatafile.dart';
 
 class editCerScreen extends StatefulWidget {
   static const String routeName = 'edit car screen' ;
-
   @override
   State<editCerScreen> createState() => _editCerScreenState();
 }
 
 class _editCerScreenState extends State<editCerScreen> {
-  SQLDB SqlDb = SQLDB();
+
+  MyDataBase db = MyDataBase();
 
   File? image;
+  XFile? pickedImage ;
   final imagepicker = ImagePicker();
-  Uint8List? bytes;
-  String? img64 ;
-
+  UploadTask? uploadTask ;
+  
   final formKey = GlobalKey<FormState>();
 
   uploadImage() async {
     // the image in the page
-    XFile? pickedImage = await imagepicker.pickImage(source: ImageSource.gallery);
+    XFile? picked_Image = await imagepicker.pickImage(source: ImageSource.gallery);
+    pickedImage = picked_Image ;
     if (pickedImage == null) return;
-    image = File(pickedImage.path);
-    bytes = File(image!.path).readAsBytesSync();
-    img64 = base64Encode(bytes!);
-    setState(() {
-
-    });
+    image = File(pickedImage!.path);
+    setState(() {});
   }
   // cars list
   final Car_makers_name_list = [
@@ -59,698 +55,414 @@ class _editCerScreenState extends State<editCerScreen> {
   ];
   String Year = 'Year' ;
   // the transition type
-  final Fual_list = ['Fual Type' , 'Kerosene' , 'Solar Oil', 'Diesel Oil', 'Fuel Oil', 'Biodiesel' , 'Gasoline' ];
-  String Fual = 'Fual Type' ;
-  // the transition type
   final Seats_list = ['Seats' , '2' , '3', '4', '5', '6' , '7' ];
   String Seats = 'Seats' ;
-  // the transition type
-  final TractionType_list = ['Traction Type' , 'Front Wheel Drive – FWD Meaning' , 'Rear Wheel Drive – RWD Meaning',
-    'Four Wheel Drive – 4WD Meaning', 'All-Wheel Drive – AWD Meaning'];
-  String TractionType = 'Traction Type' ;
-
-  List<Department> departments =[];
-  List<Make> maker =[];
 
   @override
   Widget build(BuildContext context) {
-    readDepartmentdata();
-    readMakerdata() ;
-    var mediaquery = MediaQuery.of(context).size;
     Car car = ModalRoute.of(context)?.settings.arguments as Car ;
+    var mediaquery = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Edit Car Screen"),
+        title: Text("Enter The New Car Data"),
       ),
-      body: Column(
-        children: [
-          // the profile screen code
-          Container(
-            width: mediaquery.width,
-            height: mediaquery.height * 0.3,
-            decoration:const BoxDecoration(
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: InkWell(
-                borderRadius: BorderRadius.circular(100000),
-                onTap: uploadImage,
-                child: Container(
-                    decoration:const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: MyTheme.primarycolor,
-                    ),
-                    height: mediaquery.height*0.25,
-                    width: mediaquery.width,
-                    child:image == null? Icon(Icons.camera_alt_rounded , color: MyTheme.white, size: 40,):Container(
-                      decoration: BoxDecoration(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // the profile screen code
+            Container(
+              width: mediaquery.width,
+              height: mediaquery.height * 0.3,
+              decoration:const BoxDecoration(
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(100000),
+                  onTap: uploadImage,
+                  child: Container(
+                      decoration:const BoxDecoration(
                         shape: BoxShape.circle,
-                        image: DecorationImage(image: FileImage(image! ),fit: BoxFit.contain),
-                        color: Colors.transparent,
+                        color: MyTheme.primarycolor,
                       ),
-                    )
+                      height: mediaquery.height*0.25,
+                      width: mediaquery.width,
+                      child:image == null? Icon(Icons.camera_alt_rounded , color: MyTheme.white, size: 40,):Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(image: FileImage(image! )),
+                          color: Colors.transparent,
+                        ),
+                      )
+                  ),
                 ),
               ),
             ),
-          ),
-          Expanded(
-              child: Container(
-
-                child: Form(
-                  key: formKey,
-                  child: ListView(
-                    children: [
-                      // Color
-                      Container(
-                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                        child: TextFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10)
-                              ),
-                              label: Text( "Color",
-                                style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
-                              ),
-                              contentPadding:const EdgeInsets.symmetric(horizontal: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide:const BorderSide(color: Colors.white, width: 2),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10))),
-                          cursorColor: MyTheme.primarycolor,
-                          validator: (value) {
-                            if (value == null || value.isEmpty){
-                              return "Invalid Value it Must not be Empty" ;
-                            }
-                            else{
-                              return null;
-                            }
-                          },
-                          onChanged: (val) {
-                            car.Color = val;
-                            setState(() {
-                            });
-                          },
+            Form(key: formKey,
+              child: Column(children:[
+                // Color
+                Container(
+                  margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
+                  child: TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                            borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
+                            borderRadius: BorderRadius.circular(10)
                         ),
-                      ),
-                      // Department ID
-                      Container(
-                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                        child: TextFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
-                          inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9.,]')),],
-                          decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10)
-                              ),
-                              label: Text( "Department ID",
-                                style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
-                              ),
-                              contentPadding:const EdgeInsets.symmetric(horizontal: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide:const BorderSide(color: Colors.white, width: 2),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10))),
-                          cursorColor: MyTheme.primarycolor,
-                          validator: (value) {
-                            for (int i =0 ; i< departments.length ; i++){
-                              if(departments[i].DepartmentID.toString() == value){
-                                return null;
-                              }
-                            }
-                            return "invalied Department Id" ;
-                          },
-                          onChanged: (val) {
-                            car.DepartmentID = int.parse(val);
-                            setState(() {
-                            });
-                          },
+                        label: Text( "Color",
+                          style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
                         ),
-                      ),
-                      // Maker id
-                      Container(
-                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                        child: TextFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
-                          inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9.,]')),],
-                          decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10)
-                              ),
-                              label: Text( "Maker ID",
-                                style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
-                              ),
-                              contentPadding:const EdgeInsets.symmetric(horizontal: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide:const BorderSide(color: Colors.white, width: 2),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10))),
-                          cursorColor: MyTheme.primarycolor,
-                          validator: (value) {
-                            for (int i =0 ; i< maker.length ; i++){
-                              if(maker[i].MakerID.toString() == value){
-                                return null;
-                              }
-                            }
-                            return "invalied Department Id" ;
-                          },
-                          onChanged: (val) {
-                            car.MakerID = int.parse(val);
-                            setState(() {
-                            });
-                          },
+                        contentPadding:const EdgeInsets.symmetric(horizontal: 20),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide:const BorderSide(color: Colors.white, width: 2),
                         ),
-                      ),
-                      // car brand
-                      Container(
-                        padding:const EdgeInsets.symmetric(horizontal: 20),
-                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          border: Border.all(width: 1 ,color: MyTheme.primarycolor),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: Car_Maker,
-                            style: Theme.of(context).textTheme.headline1?.copyWith(color: MyTheme.primarycolor , fontWeight: FontWeight.w400),
-                            dropdownColor: MyTheme.white,
-                            isExpanded: true,
-                            borderRadius: BorderRadius.circular(10),
-                            icon:const Icon(Icons.add, color: MyTheme.primarycolor,),
-                            items: Car_makers_name_list.map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (value) => setState(() {
-                              car.ManufacturCompany = value! ;
-                              this.Car_Maker = value!;
-                            }
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Car Model
-                      Container(
-                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                        child: TextFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10)
-                              ),
-                              label: Text( "Car Model",
-                                style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
-                              ),
-                              contentPadding:const EdgeInsets.symmetric(horizontal: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide:const BorderSide(color: Colors.white, width: 2),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10))),
-                          cursorColor: MyTheme.primarycolor,
-                          validator: (value) {
-                            if (value == null || value.isEmpty){
-                              return "Invalid Value it Must not be Empty" ;
-                            }
-                            else{
-                              return null;
-                            }
-                          },
-                          onChanged: (val) {
-                            car.CarModel = val ;
-                            setState(() {
-                            });
-                          },
-                        ),
-                      ),
-                      // Engine Capacity
-                      Container(
-                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                        child: TextFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
-                          decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10)
-                              ),
-                              label: Text( "Engine Capacity",
-                                style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
-                              ),
-                              contentPadding:const EdgeInsets.symmetric(horizontal: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide:const BorderSide(color: Colors.white, width: 2),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10))),
-                          cursorColor: MyTheme.primarycolor,
-                          validator: (value) {
-                            if (value == null || value.isEmpty){
-                              return "Invalid Value it Must not be Empty" ;
-                            }
-                          },
-                          onChanged: (val) {
-                            car.EngineCapacity = val;
-                            setState(() {
-                            });
-                          },
-                        ),
-                      ),
-                      // Horse Power
-                      Container(
-                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                        child: TextFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10)
-                              ),
-                              label: Text( "Horse Power",
-                                style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
-                              ),
-                              contentPadding:const EdgeInsets.symmetric(horizontal: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide:const BorderSide(color: Colors.white, width: 2),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10))),
-                          cursorColor: MyTheme.primarycolor,
-                          validator: (value) {
-                            if (value == null || value.isEmpty){
-                              return "Invalid Value it Must not be Empty" ;
-                            }
-                          },
-                          onChanged: (val) {
-                            car.HorsePower = val;
-                            setState(() {
-                            });
-                          },
-                        ),
-                      ),
-                      // Maximum Speed
-                      Container(
-                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                        child: TextFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
-                          decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10)
-                              ),
-                              label: Text( "Maximum Speed",
-                                style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
-                              ),
-                              contentPadding:const EdgeInsets.symmetric(horizontal: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide:const BorderSide(color: Colors.white, width: 2),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10))),
-                          cursorColor: MyTheme.primarycolor,
-                          validator: (value) {
-                            if (value == null || value.isEmpty){
-                              return "Invalid Value it Must not be Empty" ;
-                            }
-                          },
-                          onChanged: (val) {
-                            car.MaximumSpeed = val;
-                            setState(() {
-                            });
-                          },
-                        ),
-                      ),
-                      // TankSize
-                      Container(
-                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                        child: TextFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
-                          decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10)
-                              ),
-                              label: Text( "Tank Size",
-                                style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
-                              ),
-                              contentPadding:const EdgeInsets.symmetric(horizontal: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide:const BorderSide(color: Colors.white, width: 2),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10))),
-                          cursorColor: MyTheme.primarycolor,
-                          validator: (value) {
-                            if (value == null || value.isEmpty){
-                              return "Invalid Value it Must not be Empty" ;
-                            }
-                          },
-                          onChanged: (val) {
-                            car.TankSize = val;
-                            setState(() {
-                            });
-                          },
-                        ),
-                      ),
-                      // Transmition Type
-                      Container(
-                        padding:const EdgeInsets.symmetric(horizontal: 20),
-                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          border: Border.all(width: 1 ,color: MyTheme.primarycolor),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: Transmition_type,
-                            style: Theme.of(context).textTheme.headline1?.copyWith(color: MyTheme.primarycolor , fontWeight: FontWeight.w400),
-                            dropdownColor: MyTheme.white,
-                            isExpanded: true,
-                            borderRadius: BorderRadius.circular(10),
-                            icon:const Icon(Icons.add, color: MyTheme.primarycolor,),
-                            items: Transmission_Type_List.map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (value) => setState(() {
-                              car.TransmissionType = value! ;
-                              this.Transmition_type = value!;
-                            }),
-                          ),
-                        ),
-                      ),
-                      // year
-                      Container(
-                        padding:const EdgeInsets.symmetric(horizontal: 20),
-                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          border: Border.all(width: 1 ,color: MyTheme.primarycolor),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: Year,
-                            style: Theme.of(context).textTheme.headline1?.copyWith(color: MyTheme.primarycolor , fontWeight: FontWeight.w400),
-                            dropdownColor: MyTheme.white,
-                            isExpanded: true,
-                            borderRadius: BorderRadius.circular(10),
-                            icon:const Icon(Icons.add, color: MyTheme.primarycolor,),
-                            items: Year_List.map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (value) => setState(() {
-                              car.YearModel = value!;
-                              this.Year = value!;
-                            }),
-                          ),
-                        ),
-                      ),
-                      //Fual
-                      Container(
-                        padding:const EdgeInsets.symmetric(horizontal: 20),
-                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          border: Border.all(width: 1 ,color: MyTheme.primarycolor),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: Fual,
-                            style: Theme.of(context).textTheme.headline1?.copyWith(color: MyTheme.primarycolor , fontWeight: FontWeight.w400),
-                            dropdownColor: MyTheme.white,
-                            isExpanded: true,
-                            borderRadius: BorderRadius.circular(10),
-                            icon:const Icon(Icons.add, color: MyTheme.primarycolor,),
-                            items: Fual_list.map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (value) => setState(() {
-                              car.Fuel = value!;
-                              this.Fual= value!;
-                            }),
-                          ),
-                        ),
-                      ),
-                      //Seats
-                      Container(
-                        padding:const EdgeInsets.symmetric(horizontal: 20),
-                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          border: Border.all(width: 1 ,color: MyTheme.primarycolor),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: Seats,
-                            style: Theme.of(context).textTheme.headline1?.copyWith(color: MyTheme.primarycolor , fontWeight: FontWeight.w400),
-                            dropdownColor: MyTheme.white,
-                            isExpanded: true,
-                            borderRadius: BorderRadius.circular(10),
-                            icon:const Icon(Icons.add, color: MyTheme.primarycolor,),
-                            items: Seats_list.map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (value) => setState(() {
-                              car.Seats = value!;
-                              this.Seats= value!;
-                            }),
-                          ),
-                        ),
-                      ),
-                      //TractionType
-                      Container(
-                        padding:const EdgeInsets.symmetric(horizontal: 20),
-                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          border: Border.all(width: 1 ,color: MyTheme.primarycolor),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: TractionType,
-                            style: Theme.of(context).textTheme.headline1?.copyWith(color: MyTheme.primarycolor , fontWeight: FontWeight.w400),
-                            dropdownColor: MyTheme.white,
-                            isExpanded: true,
-                            borderRadius: BorderRadius.circular(10),
-                            icon:const Icon(Icons.add, color: MyTheme.primarycolor,),
-                            items: TractionType_list.map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (value) => setState(() {
-                              car.TractionType = value!;
-                              this.TractionType = value!;
-                            }),
-                          ),
-                        ),
-                      ),
-                      // FuelTankCapacity
-                      Container(
-                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                        child: TextFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
-                          decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10)
-                              ),
-                              label: Text( "Fuel Tank Capacity",
-                                style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
-                              ),
-                              contentPadding:const EdgeInsets.symmetric(horizontal: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide:const BorderSide(color: Colors.white, width: 2),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10))),
-                          cursorColor: MyTheme.primarycolor,
-                          validator: (value) {
-                            if (value == null || value.isEmpty){
-                              return "Invalid Value it Must not be Empty" ;
-                            }
-                          },
-                          onChanged: (val) {
-                            car.FuelTankCapacity = val;
-                            setState(() {
-                            });
-                          },
-                        ),
-                      ),
-                      // NumberOfCylinder
-                      Container(
-                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                        child: TextFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
-                          decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10)
-                              ),
-                              label: Text( "Number Of Cylinder",
-                                style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
-                              ),
-                              contentPadding:const EdgeInsets.symmetric(horizontal: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide:const BorderSide(color: Colors.white, width: 2),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10))),
-                          cursorColor: MyTheme.primarycolor,
-                          validator: (value) {
-                            if (value == null || value.isEmpty){
-                              return "Invalid Value it Must not be Empty" ;
-                            }
-                          },
-                          onChanged: (val) {
-                            car.NumberOfCylinder = val;
-                            setState(() {
-                            });
-                          },
-                        ),
-                      ),
-                      // price
-                      Container(
-                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                        child: TextFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
-                          decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10)
-                              ),
-                              label: Text( "Price",
-                                style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
-                              ),
-                              contentPadding:const EdgeInsets.symmetric(horizontal: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide:const BorderSide(color: Colors.white, width: 2),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
-                                  borderRadius: BorderRadius.circular(10))),
-                          cursorColor: MyTheme.primarycolor,
-                          validator: (value) {
-                            if (value == null || value.isEmpty){
-                              return "Invalid Value it Must not be Empty" ;
-                            }
-                          },
-                          onChanged: (val) {
-                            car.Price = double.parse(val);
-                            setState(() {
-                            });
-                          },
-                        ),
-                      ),
-                      Container(
-                        margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
-                        child: ElevatedButton(
-                          onPressed: (){
-                            final isvalidform = formKey.currentState!.validate();
-                            print('${car.CarID}');
-                            print('$car');
-                            if( isvalidform ){
-                              SqlDb.updateData("UPDATE 'Car' SET 'Color' = '${car.Color}' , 'DepartmentID' = '${car.DepartmentID}' , 'MakerID' = '${car.MakerID}', 'ManufacturCompany' = '${car.ManufacturCompany}', 'CarModel' ='${car.CarModel}', 'EngineCapacity'='${car.EngineCapacity}' , 'HorsePower'='${car.HorsePower}' , 'MaximumSpeed'='${car.MaximumSpeed}' , 'TransmissionType'='${car.TransmissionType}' ,'YearModel'='${car.YearModel}' , 'Fuel'='${car.Fuel}' ,'TankSize' ='${car.TankSize}', 'Seats'='${car.Seats}' , 'TractionType'='${car.TractionType}' , 'FuelTankCapacity'='${car.FuelTankCapacity}', 'NumberOfCylinder'= '${car.NumberOfCylinder}' , 'Price'='${car.Price}' , 'Image' = '${img64}' WHERE 'CarID'=${car.CarID} ");
-                              Navigator.pop(context);
-                            }
-                          },
-                          child: Text("Edit Car",style: Theme.of(context).textTheme.headline2?.copyWith(fontSize: 24,fontWeight: FontWeight.w500),),
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).primaryColor,
-                              padding: const EdgeInsets.all(10),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(200),
-                              )
-                          ),
-                        ),
-                      ),
-                    ],
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
+                            borderRadius: BorderRadius.circular(10))),
+                    cursorColor: MyTheme.primarycolor,
+                    onChanged: (val) {
+                      car.Color = val;
+                      setState(() {
+                      });},
                   ),
                 ),
-              )
-          )
+                // Department ID
+                Container(
+                  margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
+                  child: TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
+                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[0-9.,]')),],
+                    decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                            borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
+                            borderRadius: BorderRadius.circular(10)
+                        ),
+                        label: Text( "Department ID",
+                          style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
+                        ),
+                        contentPadding:const EdgeInsets.symmetric(horizontal: 20),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide:const BorderSide(color: Colors.white, width: 2),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
+                            borderRadius: BorderRadius.circular(10))),
+                    cursorColor: MyTheme.primarycolor,
+                    validator: (value) {
+                      if (value == '1' || value == '2' || value == '3' || value == '4' ){
+                        return null ;
+                      }
+                      return "invalied Department Id" ;
+                    },
+                    onChanged: (val) {
+                      car.DepartmentID = val;
+                      setState(() {
+                      });},
+                  ),
+                ),
+                // car brand
+                Container(
+                  padding:const EdgeInsets.symmetric(horizontal: 20),
+                  margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    border: Border.all(width: 1 ,color: MyTheme.primarycolor),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: Car_Maker,
+                      style: Theme.of(context).textTheme.headline1?.copyWith(color: MyTheme.primarycolor , fontWeight: FontWeight.w400),
+                      dropdownColor: MyTheme.white,
+                      isExpanded: true,
+                      borderRadius: BorderRadius.circular(10),
+                      icon:const Icon(Icons.add, color: MyTheme.primarycolor,),
+                      items: Car_makers_name_list.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (value) => setState(() {
+                        car.ManufacturCompany = value! ;
+                        this.Car_Maker = value!;
+                      }
+                      ),
+                    ),
+                  ),
+                ),
+                // Car Model
+                Container(
+                  margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
+                  child: TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                            borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
+                            borderRadius: BorderRadius.circular(10)
+                        ),
+                        label: Text( "Car Model",
+                          style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
+                        ),
+                        contentPadding:const EdgeInsets.symmetric(horizontal: 20),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide:const BorderSide(color: Colors.white, width: 2),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
+                            borderRadius: BorderRadius.circular(10))),
+                    cursorColor: MyTheme.primarycolor,
+                    onChanged: (val) {
+                      car.CarModel = val ;
+                    },
+                  ),
+                ),
+                // Horse Power
+                Container(
+                  margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
+                  child: TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
+                    decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                            borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
+                            borderRadius: BorderRadius.circular(10)
+                        ),
+                        label: Text( "Horse Power",
+                          style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
+                        ),
+                        contentPadding:const EdgeInsets.symmetric(horizontal: 20),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide:const BorderSide(color: Colors.white, width: 2),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
+                            borderRadius: BorderRadius.circular(10))),
+                    cursorColor: MyTheme.primarycolor,
+                    
+                    onChanged: (val) {
+                      car.HorsePower = val;
+                    },
+                  ),
+                ),
+                // Maximum Speed
+                Container(
+                  margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
+                  child: TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
+                    decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                            borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
+                            borderRadius: BorderRadius.circular(10)
+                        ),
+                        label: Text( "Maximum Speed",
+                          style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
+                        ),
+                        contentPadding:const EdgeInsets.symmetric(horizontal: 20),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide:const BorderSide(color: Colors.white, width: 2),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
+                            borderRadius: BorderRadius.circular(10))),
+                    cursorColor: MyTheme.primarycolor,
+                    
+                    onChanged: (val) {
+                      car.MaximumSpeed = val;
+                    },
+                  ),
+                ),
+                // Transmition Type
+                Container(
+                  padding:const EdgeInsets.symmetric(horizontal: 20),
+                  margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    border: Border.all(width: 1 ,color: MyTheme.primarycolor),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: Transmition_type,
+                      style: Theme.of(context).textTheme.headline1?.copyWith(color: MyTheme.primarycolor , fontWeight: FontWeight.w400),
+                      dropdownColor: MyTheme.white,
+                      isExpanded: true,
+                      borderRadius: BorderRadius.circular(10),
+                      icon:const Icon(Icons.add, color: MyTheme.primarycolor,),
+                      items: Transmission_Type_List.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (value) => setState(() {
+                        car.TransmissionType = value! ;
+                        this.Transmition_type = value!;
+                      }),
+                    ),
+                  ),
+                ),
+                // year
+                Container(
+                  padding:const EdgeInsets.symmetric(horizontal: 20),
+                  margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    border: Border.all(width: 1 ,color: MyTheme.primarycolor),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: Year,
+                      style: Theme.of(context).textTheme.headline1?.copyWith(color: MyTheme.primarycolor , fontWeight: FontWeight.w400),
+                      dropdownColor: MyTheme.white,
+                      isExpanded: true,
+                      borderRadius: BorderRadius.circular(10),
+                      icon:const Icon(Icons.add, color: MyTheme.primarycolor,),
+                      items: Year_List.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (value) => setState(() {
+                        car.YearModel = value!;
+                        this.Year = value!;
+                      }),
+                    ),
+                  ),
+                ),
+                // Seats
+                Container(
+                  padding:const EdgeInsets.symmetric(horizontal: 20),
+                  margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    border: Border.all(width: 1 ,color: MyTheme.primarycolor),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: Seats,
+                      style: Theme.of(context).textTheme.headline1?.copyWith(color: MyTheme.primarycolor , fontWeight: FontWeight.w400),
+                      dropdownColor: MyTheme.white,
+                      isExpanded: true,
+                      borderRadius: BorderRadius.circular(10),
+                      icon:const Icon(Icons.add, color: MyTheme.primarycolor,),
+                      items: Seats_list.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (value) => setState(() {
+                        car.Seats = value!;
+                        this.Seats= value!;
+                      }),
+                    ),
+                  ),
+                ),
+                // price
+                Container(
+                  margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
+                  child: TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
+                    decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                            borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
+                            borderRadius: BorderRadius.circular(10)
+                        ),
+                        label: Text( "Price",
+                          style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 20, fontWeight: FontWeight.w400),
+                        ),
+                        contentPadding:const EdgeInsets.symmetric(horizontal: 20),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide:const BorderSide(color: Colors.white, width: 2),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
+                            borderRadius: BorderRadius.circular(10))),
+                    cursorColor: MyTheme.primarycolor,
+                    onChanged: (val) {
+                      car.Price = double.parse(val);
+                      setState(() {
+                      });},
+                  ),
+                ),
 
-        ],
+                Container(
+                  margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
+                  width: mediaquery.width,
+                  child: ElevatedButton(
+                    onPressed: ()async{
+                      final isvalidform = formKey.currentState!.validate();
+                      if (isvalidform){
+                        DialogUtils.showDialogeMessage(Message: "Loading...", context: context);
+                        try{
+                          await updatedata(car);
+                          DialogUtils.hideDialogMessage(context: context);
+                          DialogUtils.showMessage(message: "Car Updated Sucsessfuly", context: context ,
+                              posActiontitle: "Ok" ,
+                              posAction: (){
+                                Navigator.pop(context);
+                              }
+                          );
+                        }catch(Error){
+                          DialogUtils.hideDialogMessage(context: context);
+                          DialogUtils.showMessage(message: "Error inserting data", context: context,
+                            posAction: () async{
+                              await updatedata(car);
+                            },
+                            posActiontitle: "Try Again",
+                            nigAction: (){
+                              Navigator.pop(context);
+                            },
+                            nigActiontitle: "Cancel",
+                            isdeismessable: true ,
+                          );
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColor,
+                        padding: const EdgeInsets.all(10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(200),
+                        )
+                    ),
+                    child: Text("Add Car",style: Theme.of(context).textTheme.headline2?.copyWith(fontSize: 24,fontWeight: FontWeight.w500),),
+                  ),
+                ),
+              ],),
+            ),
+          ],
+        ),
       ),
     );
   }
-  readDepartmentdata ()async{
-    List<Map<String , dynamic>> response = await SqlDb.readData("SELECT * FROM 'Department'");
-    departments = List.generate(response.length, (index) {
-      return Department(
-        DepartmentID: response[index]['DepartmentID'],
-        DepartmentName: response[index]['DepartmentName'],
-        DepartmentLocation: response[index]['DepartmentLocation'],
-        DepartmentStartDate: response[index]['DepartmentStartDate'],
-      );
-    });
+  Future<void> updatedata (Car car) async{
+    final isvalidform = formKey.currentState!.validate();
+    if( isvalidform ){
+      if(pickedImage != null){
+        final path = 'images/${pickedImage!.name}';
+        final file = File(pickedImage!.path);
+        final ref = FirebaseStorage.instance.ref().child(path);
+        uploadTask = ref.putFile(file);
+        final snapshot = await uploadTask!.whenComplete(() {});
+        final url = await snapshot.ref.getDownloadURL();
+        car.Image = url;
+      }
+      await MyDataBase.updatecar(car);
+    }
   }
-
-  readMakerdata ()async{
-    List<Map<String , dynamic>> response = await SqlDb.readData("SELECT * FROM 'Make'");
-    maker = List.generate(response.length, (index) {
-      return Make(
-          MakerID: response[index]['MakerID'],
-          MakerName: response[index]['MakerName'],
-          OriginCountry: response[index]['OriginCountry'],
-          Agent: response[index]['Agent']
-      );
-    });
-  }
-
 }

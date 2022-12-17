@@ -71,8 +71,7 @@ class _AdminHomeScreeState extends State<AdminHomeScree> {
             elevation: 0,
             onTap: (index){
               curantindex = index;
-              setState(() {
-              });
+              setState(() {});
             },
             items:const [
               BottomNavigationBarItem(icon: Icon(Icons.car_rental_rounded) , label: ""),

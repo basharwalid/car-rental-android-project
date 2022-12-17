@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:core';
-import 'package:app/FireBase_FireStore_DataBase/car/My_DataBase.dart';
-import 'package:app/FireBase_FireStore_DataBase/car/car.dart';
+import 'package:app/FireBase_FireStore_DataBase/My_DataBase.dart';
 import 'package:app/UI/Admin_Interface/Admin_home_Screen.dart';
 import 'package:app/UI/theme/themedatafile.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../FireBase_FireStore_DataBase/car/car.dart';
 import '../../../utils/Dialogs_utils_class.dart';
 
 class AddCerScreen extends StatefulWidget {
@@ -40,8 +40,6 @@ class _AddCerScreenState extends State<AddCerScreen> {
       Price: 0,
       Image: ""
   );
-
-
 
   final formKey = GlobalKey<FormState>();
 
@@ -259,6 +257,7 @@ class _AddCerScreenState extends State<AddCerScreen> {
                   margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
                   child: TextFormField(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
+                    keyboardType:const TextInputType.numberWithOptions(decimal: false , signed: false),
                     decoration: InputDecoration(
                         enabledBorder: OutlineInputBorder(
                             borderSide:const BorderSide( width: 1, color: MyTheme.primarycolor),
@@ -377,7 +376,7 @@ class _AddCerScreenState extends State<AddCerScreen> {
                     ),
                   ),
                 ),
-                //Seats
+                // Seats
                 Container(
                   padding:const EdgeInsets.symmetric(horizontal: 20),
                   margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
@@ -445,8 +444,35 @@ class _AddCerScreenState extends State<AddCerScreen> {
                   margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
                   width: mediaquery.width,
                   child: ElevatedButton(
-                    onPressed: (){
-                      insertdata();
+                    onPressed: ()async{
+
+                      final isvalidform = formKey.currentState!.validate();
+                      if (isvalidform){
+                        DialogUtils.showDialogeMessage(Message: "Loading...", context: context);
+                        try{
+                          await insertdata();
+                          DialogUtils.hideDialogMessage(context: context);
+                          DialogUtils.showMessage(message: "Car Updated Sucsessfuly", context: context ,
+                              posActiontitle: "Ok" ,
+                              posAction: (){
+                                Navigator.pop(context);
+                              }
+                          );
+                        }catch(Error){
+                          DialogUtils.hideDialogMessage(context: context);
+                          DialogUtils.showMessage(message: "Error inserting data", context: context,
+                            posAction: () async{
+                              await insertdata();
+                            },
+                            posActiontitle: "Try Again",
+                            nigAction: (){
+                              Navigator.pop(context);
+                            },
+                            nigActiontitle: "Cancel",
+                            isdeismessable: true ,
+                          );
+                        }
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).primaryColor,
@@ -466,8 +492,7 @@ class _AddCerScreenState extends State<AddCerScreen> {
     );
   }
 
-  void insertdata () async{
-    DialogUtils.showDialogeMessage(Message: "Loading...", context: context);
+  Future<void> insertdata () async{
     final isvalidform = formKey.currentState!.validate();
     if( isvalidform ){
       if(pickedImage != null){
@@ -481,6 +506,5 @@ class _AddCerScreenState extends State<AddCerScreen> {
       }
       await MyDataBase.insertCarData(car);
     }
-    DialogUtils.hideDialogMessage(context: context);
   }
 }

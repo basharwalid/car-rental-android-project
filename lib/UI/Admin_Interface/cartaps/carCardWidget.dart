@@ -1,10 +1,10 @@
 import 'dart:convert';
-
-import 'package:app/DataBase/DataClasses/Car.dart';
-import 'package:app/DataBase/Database.dart';
+import 'package:app/FireBase_FireStore_DataBase/My_DataBase.dart';
 import 'package:app/UI/Admin_Interface/cartaps/editdataofthecar.dart';
 import 'package:app/UI/theme/themedatafile.dart';
+import 'package:app/utils/Dialogs_utils_class.dart';
 import 'package:flutter/material.dart';
+import '../../../FireBase_FireStore_DataBase/car/car.dart';
 
 class CarCardWidget extends StatefulWidget {
   Car car ;
@@ -15,7 +15,6 @@ class CarCardWidget extends StatefulWidget {
 }
 
 class _CarCardWidgetState extends State<CarCardWidget> {
-  SQLDB sqldb = SQLDB() ;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +47,7 @@ class _CarCardWidgetState extends State<CarCardWidget> {
           Text("${widget.car.ManufacturCompany}" , style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 30),textAlign: TextAlign.center,),
           Container(
               height: mq.height * 0.25,
-              child: Image.memory(base64Decode("${widget.car.Image}") , width: mq.width*0.1, fit: BoxFit.contain,)
+              child: Image.network('${widget.car.Image}'),
           ),
           SizedBox(height: 10,),
           Row(
@@ -57,8 +56,7 @@ class _CarCardWidgetState extends State<CarCardWidget> {
                 margin:const EdgeInsets.symmetric(horizontal:5 , vertical: 10),
                 child: ElevatedButton(
                   onPressed: ()async{
-                    await sqldb.deleteData("DELETE FROM 'Car' WHERE CarID = ${widget.car.CarID} ");
-                    setState(() {});
+                    deletethecar(widget.car);
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
@@ -102,11 +100,26 @@ class _CarCardWidgetState extends State<CarCardWidget> {
 
                 ),
               )  ),
-
             ],
           ),
         ],
       ),
+    );
+  }
+
+  void deletethecar(Car car) {
+    DialogUtils.showMessage(message: "Are You Sure That You Want To Delete The Car", context: context,
+      posActiontitle: "ok",
+      posAction: ()async {
+        DialogUtils.showDialogeMessage(Message: "Loading..", context: context);
+        await MyDataBase.deletecar(car);
+        DialogUtils.hideDialogMessage(context: context);
+        DialogUtils.showMessage(message: "Car Inserted Sucsessfuly", context: context ,
+            posActiontitle: "Ok" ,
+        );
+      },
+      nigActiontitle: "Cancel",
+      isdeismessable: true
     );
   }
 }
