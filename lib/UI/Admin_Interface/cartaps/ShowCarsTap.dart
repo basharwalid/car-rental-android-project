@@ -12,10 +12,6 @@ class ShowCarsTap extends StatefulWidget {
 
 class _ShowCarsTapState extends State<ShowCarsTap> {
   @override
-  void initState(){
-    super.initState();
-  }
-  @override
   Widget build(BuildContext context){
     return FutureBuilder <List<Car>> (
       future: MyDataBase.getCarsData(),

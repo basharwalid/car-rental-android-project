@@ -7,8 +7,6 @@ class Employee {
   String EmployeeAge ;
   String EmployeeNationalID ;
   String EmployeePhoneNumber ;
-  String EmployeeCountry ;
-  String EmployeeCity ;
   double EmployeeSalary ;
   String Image ;
 
@@ -21,10 +19,35 @@ class Employee {
     required this.EmployeeAge ,
     required this.EmployeeNationalID ,
     required this.EmployeePhoneNumber ,
-    required this.EmployeeCountry ,
-    required this.EmployeeCity ,
     required this.EmployeeSalary ,
     required this.Image
   });
 
+  Employee.fromFireStore(Map<String , dynamic> data):this(
+      EmployeeID : data['EmployeeID'],
+      EmployeeDepartment : data['EmployeeDepartment'],
+      EmployeeName : data['EmployeeName'] ,
+      EmployeeEmail : data ['EmployeeEmail'],
+      EmployeePassword : data['EmployeePassword'],
+      EmployeeAge : data['EmployeeAge'],
+      EmployeeNationalID : data['EmployeeNationalID'] ,
+      EmployeePhoneNumber : data['EmployeePhoneNumber'] ,
+      EmployeeSalary : data['EmployeeSalary'],
+      Image : data['Image'],
+  );
+
+  Map<String , dynamic> tofirestore (){
+    return {
+      'EmployeeID' : EmployeeID ,
+      'EmployeeDepartment' : EmployeeDepartment,
+      'EmployeeName' : EmployeeName ,
+      'EmployeeEmail' : EmployeeEmail,
+      'EmployeePassword' : EmployeePassword,
+      'EmployeeAge' : EmployeeAge,
+      'EmployeeNationalID' : EmployeeNationalID,
+      'EmployeePhoneNumber' : EmployeePhoneNumber ,
+      'EmployeeSalary' : EmployeeSalary ,
+      'Image' : Image,
+    };
+}
 }
