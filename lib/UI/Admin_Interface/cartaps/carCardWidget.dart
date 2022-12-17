@@ -112,7 +112,7 @@ class _CarCardWidgetState extends State<CarCardWidget> {
       posActiontitle: "ok",
       posAction: ()async {
         DialogUtils.showDialogeMessage(Message: "Loading..", context: context);
-        await MyDataBase.deletecar(car);
+        MyDataBase.deletecar(car);
         DialogUtils.hideDialogMessage(context: context);
         DialogUtils.showMessage(message: "Car Inserted Sucsessfuly", context: context ,
             posActiontitle: "Ok" ,

@@ -19,10 +19,9 @@ class  MyDataBase {
     return doc.set(car);
   }
 
-  static Future<List<Car>> getCarsData() async{
-    var snapshot = await getCarCollection().get();
-    var list = snapshot.docs.map((doc) => doc.data()).toList();
-    return list;
+
+  static Stream<QuerySnapshot<Car>> getcardatastream(){
+    return getCarCollection().snapshots();
   }
 
   static deletecar(Car car) async{
@@ -49,10 +48,8 @@ class  MyDataBase {
     return doc.set(employee);
   }
 
-  static Future<List<Employee>> getEmployeesData() async{
-    var snapshot = await getEmployeeCollection().get();
-    var list = snapshot.docs.map((doc) => doc.data()).toList();
-    return list;
+  static Stream<QuerySnapshot<Employee>> getEmployeesData(){
+    return getEmployeeCollection().snapshots();
   }
 
   static deleteEmployee(Employee employee) async{

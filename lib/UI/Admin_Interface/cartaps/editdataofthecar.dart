@@ -64,7 +64,7 @@ class _editCerScreenState extends State<editCerScreen> {
     var mediaquery = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Enter The New Car Data"),
+        title: Text("Edit Car Data"),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -440,7 +440,7 @@ class _editCerScreenState extends State<editCerScreen> {
                           borderRadius: BorderRadius.circular(200),
                         )
                     ),
-                    child: Text("Add Car",style: Theme.of(context).textTheme.headline2?.copyWith(fontSize: 24,fontWeight: FontWeight.w500),),
+                    child: Text("Edit Car",style: Theme.of(context).textTheme.headline2?.copyWith(fontSize: 24,fontWeight: FontWeight.w500),),
                   ),
                 ),
               ],),

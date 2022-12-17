@@ -1,5 +1,6 @@
 import 'package:app/UI/Admin_Interface/cartaps/editdataofthecar.dart';
 import 'package:app/UI/Admin_Interface/employeetaps/addEmployee.dart';
+import 'package:app/UI/Admin_Interface/employeetaps/editemployeescreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'UI/Admin_Interface/Admin_home_Screen.dart';
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
       routes:{
         AddEmployeeSCreen.routeName :(_) => AddEmployeeSCreen(),
         editCerScreen.routeName :(_) => editCerScreen(),
+        EditEmployeeScreen.routeName : (_) => EditEmployeeScreen(),
         AdminHomeScree.routeName : (_) => AdminHomeScree(),
         AddCerScreen.routeName :(_) => AddCerScreen(),
       } ,

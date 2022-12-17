@@ -1,43 +1,33 @@
-import 'dart:convert';
 import 'dart:io';
-import 'package:app/FireBase_FireStore_DataBase/My_DataBase.dart';
-import 'package:app/FireBase_FireStore_DataBase/car/employee.dart';
+
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../FireBase_FireStore_DataBase/My_DataBase.dart';
+import '../../../FireBase_FireStore_DataBase/car/employee.dart';
 import '../../../utils/Dialogs_utils_class.dart';
 import '../../theme/themedatafile.dart';
 
-class AddEmployeeSCreen extends StatefulWidget {
-  static const String routeName = 'add empl screen' ;
+class EditEmployeeScreen extends StatefulWidget {
+  static const routeName =  'edit employee ';
 
   @override
-  State<AddEmployeeSCreen> createState() => _AddEmployeeSCreenState();
+  State<EditEmployeeScreen> createState() => _EditEmployeeScreenState();
 }
 
-class _AddEmployeeSCreenState extends State<AddEmployeeSCreen> {
+class _EditEmployeeScreenState extends State<EditEmployeeScreen> {
   MyDataBase db = MyDataBase();
 
   File? image;
+
   XFile? pickedImage ;
+
   final imagepicker = ImagePicker();
+
   UploadTask? uploadTask ;
-
-  Employee employee = Employee(
-      EmployeeID: '',
-      EmployeeDepartment: 0,
-      EmployeeName:'',
-      EmployeeEmail: '',
-      EmployeePassword:'',
-      EmployeeAge:'',
-      EmployeeNationalID:'',
-      EmployeePhoneNumber:'',
-      EmployeeSalary:0,
-      Image: ''
-  );
-
+  
   final formKey = GlobalKey<FormState>();
 
   uploadImage() async {
@@ -49,10 +39,10 @@ class _AddEmployeeSCreenState extends State<AddEmployeeSCreen> {
     setState(() {});
   }
 
-
   @override
   Widget build(BuildContext context) {
     var mediaquery = MediaQuery.of(context).size;
+    Employee employee = ModalRoute.of(context)?.settings.arguments as Employee;
     return Scaffold(
       appBar: AppBar(
         title: Text("Enter The New Employee Data"),
@@ -113,13 +103,6 @@ class _AddEmployeeSCreenState extends State<AddEmployeeSCreen> {
                             borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                             borderRadius: BorderRadius.circular(10))),
                     cursorColor: MyTheme.primarycolor,
-                    validator: (value) {
-                      if (value == null || value.isEmpty){
-                        return "Invalid Value it Must not be Empty" ;
-                      }
-                      else{
-                        return null;
-                      }},
                     onChanged: (val) {
                       employee.EmployeeName = val;
                       setState(() {
@@ -151,7 +134,7 @@ class _AddEmployeeSCreenState extends State<AddEmployeeSCreen> {
                             borderRadius: BorderRadius.circular(10))),
                     cursorColor: MyTheme.primarycolor,
                     validator: (value) {
-                      if (value == '1' || value == '2' || value == '3' || value == '4' ){
+                      if (value == '1' || value == '2' || value == '3' || value == '4' || value == null || value.isEmpty){
                         return null ;
                       }
                       return "invalied Department Id" ;
@@ -190,11 +173,11 @@ class _AddEmployeeSCreenState extends State<AddEmployeeSCreen> {
                           r"{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]"
                           r"{0,253}[a-zA-Z0-9])?)*$";
                       RegExp regex = RegExp(pattern);
-                      if (value == null || value.isEmpty || !regex.hasMatch(value))
+                      if (regex.hasMatch(value!))
                         return 'Enter a valid email address';
                       else
                         return null;
-                      },
+                    },
                     onChanged: (val) {
                       employee.EmployeeEmail = val;
                       setState(() {
@@ -226,12 +209,6 @@ class _AddEmployeeSCreenState extends State<AddEmployeeSCreen> {
                             borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                             borderRadius: BorderRadius.circular(10))),
                     cursorColor: MyTheme.primarycolor,
-                    validator: (value) {
-                      if (value!.trim().isEmpty) {
-                        return 'Password is required';
-                      }
-                      return null;
-                    },
                     onChanged: (val) {
                       employee.EmployeePassword = val;
                       setState(() {
@@ -262,12 +239,6 @@ class _AddEmployeeSCreenState extends State<AddEmployeeSCreen> {
                             borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                             borderRadius: BorderRadius.circular(10))),
                     cursorColor: MyTheme.primarycolor,
-                    validator: (value) {
-                      if (value!.trim().isEmpty) {
-                        return 'Invalid age';
-                      }
-                      return null;
-                    },
                     onChanged: (val) {
                       employee.EmployeeAge = val;
                       setState(() {
@@ -298,12 +269,6 @@ class _AddEmployeeSCreenState extends State<AddEmployeeSCreen> {
                             borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                             borderRadius: BorderRadius.circular(10))),
                     cursorColor: MyTheme.primarycolor,
-                    validator: (value) {
-                      if (value!.trim().isEmpty) {
-                        return 'Invalid ID';
-                      }
-                      return null;
-                    },
                     onChanged: (val) {
                       employee.EmployeeNationalID = val;
                       setState(() {
@@ -334,12 +299,6 @@ class _AddEmployeeSCreenState extends State<AddEmployeeSCreen> {
                             borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                             borderRadius: BorderRadius.circular(10))),
                     cursorColor: MyTheme.primarycolor,
-                    validator: (value) {
-                      if (value!.trim().isEmpty) {
-                        return 'Invalid Phone Number';
-                      }
-                      return null;
-                    },
                     onChanged: (val) {
                       employee.EmployeePhoneNumber = val;
                       setState(() {
@@ -370,12 +329,6 @@ class _AddEmployeeSCreenState extends State<AddEmployeeSCreen> {
                             borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                             borderRadius: BorderRadius.circular(10))),
                     cursorColor: MyTheme.primarycolor,
-                    validator: (value) {
-                      if (value!.trim().isEmpty) {
-                        return 'Salary';
-                      }
-                      return null;
-                    },
                     onChanged: (val) {
                       employee.EmployeeSalary = double.parse(val);
                       setState(() {
@@ -389,14 +342,13 @@ class _AddEmployeeSCreenState extends State<AddEmployeeSCreen> {
                   width: mediaquery.width,
                   child: ElevatedButton(
                     onPressed: ()async{
-
                       final isvalidform = formKey.currentState!.validate();
                       if (isvalidform){
                         DialogUtils.showDialogeMessage(Message: "Loading...", context: context);
                         try{
-                          await insertdata();
+                          await updatedata(employee);
                           DialogUtils.hideDialogMessage(context: context);
-                          DialogUtils.showMessage(message: "Employee added successfully", context: context ,
+                          DialogUtils.showMessage(message: "Employee Updated Sucsessfuly", context: context ,
                               posActiontitle: "Ok" ,
                               posAction: (){
                                 Navigator.pop(context);
@@ -406,7 +358,7 @@ class _AddEmployeeSCreenState extends State<AddEmployeeSCreen> {
                           DialogUtils.hideDialogMessage(context: context);
                           DialogUtils.showMessage(message: "Error inserting data", context: context,
                             posAction: () async{
-                              await insertdata();
+                              await updatedata(employee);
                             },
                             posActiontitle: "Try Again",
                             nigAction: (){
@@ -425,7 +377,7 @@ class _AddEmployeeSCreenState extends State<AddEmployeeSCreen> {
                           borderRadius: BorderRadius.circular(200),
                         )
                     ),
-                    child: Text("Add Employee",style: Theme.of(context).textTheme.headline2?.copyWith(fontSize: 24,fontWeight: FontWeight.w500),),
+                    child: Text("Edit Employee",style: Theme.of(context).textTheme.headline2?.copyWith(fontSize: 24,fontWeight: FontWeight.w500),),
                   ),
                 ),
               ],),
@@ -435,8 +387,7 @@ class _AddEmployeeSCreenState extends State<AddEmployeeSCreen> {
       ),
     );
   }
-
-  Future<void> insertdata () async{
+  Future<void> updatedata (Employee employee) async{
     final isvalidform = formKey.currentState!.validate();
     if( isvalidform ){
       if(pickedImage != null){
@@ -448,7 +399,7 @@ class _AddEmployeeSCreenState extends State<AddEmployeeSCreen> {
         final url = await snapshot.ref.getDownloadURL();
         employee.Image = url;
       }
-      await MyDataBase.insertEmployeeData(employee);
+      await MyDataBase.updateEmployee(employee);
     }
   }
 }
