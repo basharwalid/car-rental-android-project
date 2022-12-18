@@ -19,9 +19,12 @@ class  MyDataBase {
     return doc.set(car);
   }
 
-
   static Stream<QuerySnapshot<Car>> getcardatastream(){
     return getCarCollection().snapshots();
+  }
+
+  static Stream<QuerySnapshot<Car>> getcardatastreamwithQuire(String departmentid){
+    return getCarCollection().where('DepartmentID' , isEqualTo: departmentid ).where('isAvilable' , isEqualTo: true).snapshots();
   }
 
   static deletecar(Car car) async{
