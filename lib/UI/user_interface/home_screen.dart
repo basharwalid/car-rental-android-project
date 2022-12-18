@@ -34,14 +34,18 @@ class _User_Home_screenState extends State<User_Home_screen> {
         appBar: AppBar(
           actions:<Widget> [
             InkWell(
-              borderRadius: BorderRadius.circular(100),
-              onTap: (){
-                
-              },
-                child: Icon(Icons.person_rounded,size: 30,)
+              onTap: (){},
+              borderRadius: BorderRadius.circular(1000),
+              child: Container(
+                padding: EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  border: Border.all(width: 3 , color: MyTheme.white),
+                  shape: BoxShape.circle
+                ),
+                child: Icon(Icons.person_rounded , size: 24,),
+              ),
             ),
-            SizedBox(width: 20,),
-
+            SizedBox(width: 20,)
           ],
           title: Text('Home'),
         ),
