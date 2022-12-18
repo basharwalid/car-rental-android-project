@@ -1,6 +1,7 @@
 import 'package:app/UI/Admin_Interface/cartaps/editdataofthecar.dart';
 import 'package:app/UI/Admin_Interface/employeetaps/addEmployee.dart';
 import 'package:app/UI/Admin_Interface/employeetaps/editemployeescreen.dart';
+import 'package:app/UI/user_interface/home_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'UI/Admin_Interface/Admin_home_Screen.dart';
@@ -22,13 +23,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       routes:{
+        User_Home_screen.routeName : (_) => User_Home_screen(),
         AddEmployeeSCreen.routeName :(_) => AddEmployeeSCreen(),
         editCerScreen.routeName :(_) => editCerScreen(),
         EditEmployeeScreen.routeName : (_) => EditEmployeeScreen(),
         AdminHomeScree.routeName : (_) => AdminHomeScree(),
         AddCerScreen.routeName :(_) => AddCerScreen(),
       } ,
-      initialRoute: AdminHomeScree.routeName,
+      initialRoute: User_Home_screen.routeName,
       theme: MyTheme.LightTheme,
     );
   }
