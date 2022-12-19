@@ -1,10 +1,12 @@
-import 'package:app/DataBase/Database.dart';
+import 'package:app/FireBase_FireStore_DataBase/car/employee.dart';
 import 'package:app/UI/Admin_Interface/cartaps/ShowCarsTap.dart';
 import 'package:app/UI/Admin_Interface/cartaps/addcarscreen.dart';
 import 'package:app/UI/Admin_Interface/employeetaps/Show_Emplyoee_Tap.dart';
 import 'package:app/UI/Admin_Interface/employeetaps/addEmployee.dart';
 import 'package:app/UI/theme/themedatafile.dart';
 import 'package:flutter/material.dart';
+
+import '../../FireBase_FireStore_DataBase/My_DataBase.dart';
 
 
 class AdminHomeScree extends StatefulWidget {
@@ -17,7 +19,6 @@ class AdminHomeScree extends StatefulWidget {
 class _AdminHomeScreeState extends State<AdminHomeScree> {
   int curantindex = 0;
   var taps = [ShowCarsTap(),ShowEmployeeTap()];
-  SQLDB Sqldb =SQLDB();
   @override
   Widget build(BuildContext context) {
     return Container(

@@ -1,5 +1,6 @@
 import 'package:app/FireBase_FireStore_DataBase/car/car.dart';
 import 'package:app/FireBase_FireStore_DataBase/car/employee.dart';
+import 'package:app/FireBase_FireStore_DataBase/car/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class  MyDataBase {
@@ -63,5 +64,33 @@ class  MyDataBase {
   static updateEmployee(Employee employee) async {
     var cardoc = getEmployeeCollection().doc(employee.EmployeeID);
     var ref = cardoc.update(employee.tofirestore());
+  }
+
+  static CollectionReference<User> getUsersCollection(){
+    var carcollectionref = FirebaseFirestore.instance.collection("Users").withConverter(
+        fromFirestore: (snapshot, options) => User.fromFireStore(snapshot.data()!),
+        toFirestore: (value, options) => value.tofirestore() );
+    return carcollectionref ;
+  }
+
+  static Future<void> insertUserData(User user){
+    var ref = getUsersCollection();
+    var doc = ref.doc();
+    user.id = doc.id ;
+    return doc.set(user);
+  }
+
+  static Stream<QuerySnapshot<User>> getUserData(){
+    return getUsersCollection().snapshots();
+  }
+
+  static deleteUse(User user) async{
+    var cardoc = getUsersCollection().doc(user.id);
+    return cardoc.delete();
+  }
+
+  static updateUser(User user) async {
+    var cardoc = getUsersCollection().doc(user.id);
+    var ref = cardoc.update(user.tofirestore());
   }
 }

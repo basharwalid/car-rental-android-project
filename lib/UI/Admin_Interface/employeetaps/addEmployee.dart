@@ -383,7 +383,6 @@ class _AddEmployeeSCreenState extends State<AddEmployeeSCreen> {
                   ),
                 ),
 
-
                 Container(
                   margin:const EdgeInsets.symmetric(horizontal: 20 , vertical: 10),
                   width: mediaquery.width,
