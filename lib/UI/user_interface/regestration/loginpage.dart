@@ -1,19 +1,39 @@
+import 'package:app/FireBase_FireStore_DataBase/My_DataBase.dart';
+import 'package:app/FireBase_FireStore_DataBase/car/user.dart';
 import 'package:app/UI/Admin_Interface/Admin_home_Screen.dart';
 import 'package:app/UI/theme/themedatafile.dart';
+import 'package:app/UI/user_interface/home_screen.dart';
 import 'package:app/UI/user_interface/regestration/createaccount.dart';
+import 'package:app/userprovider.dart';
 import 'package:app/utils/Dialogs_utils_class.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   static const String routeName = 'loginpage';
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   final formKey = GlobalKey<FormState>();
+
+  List<User> userslist = [];
 
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
     var mediaquere = MediaQuery.of(context).size;
+
     TextEditingController Email = TextEditingController();
     TextEditingController Password = TextEditingController();
+    if (userslist.isEmpty){
+      readdata();
+    }
+    for (int i =0 ; i<userslist.length ; i++){
+      print(userslist[i].Email);
+    }
     return Container(
       decoration:const BoxDecoration(
         image: DecorationImage(image: AssetImage("assets/login background.png", ),fit: BoxFit.cover),
@@ -115,11 +135,21 @@ class LoginPage extends StatelessWidget {
                     SizedBox(height: 10,),
                     ElevatedButton(
                       onPressed: (){
+                        for (int i =0 ; i < userslist.length ;i++){
+                          print(userslist[i].Email);
+                          if (Email.text == userslist[i].Email){
+                            if (Password.text == userslist[i].Password){
+                              Provider.of<userprovider>(context , listen: false).setactiveuser(userslist[i]);
+                              Navigator.popAndPushNamed(context, User_Home_screen.routeName);
+                            }
+                          }
+                        }
                         if(Email.text == 'Messi@win.com' && Password.text == 'messi'){
                           Navigator.popAndPushNamed(context, AdminHomeScree.routeName);
-                        }else {
-                          DialogUtils.showMessage(message: "Invalid Account", context: context ,isdeismessable: true ,posActiontitle: "ok" ,posAction: () {},);
+                          return ;
                         }
+
+                        DialogUtils.showMessage(message: "Invalid Account", context: context ,isdeismessable: true ,posActiontitle: "ok" ,posAction: () {},);
                       },
                       child: Text('Login Page' , style: Theme.of(context).textTheme.headline2,),
                       style: ButtonStyle(
@@ -148,5 +178,13 @@ class LoginPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void readdata()async {
+    userslist = await MyDataBase.listofusers();
+    print(userslist.length);
+    setState(() {
+
+    });
   }
 }

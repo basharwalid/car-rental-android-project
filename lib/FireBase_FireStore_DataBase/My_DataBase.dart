@@ -93,4 +93,10 @@ class  MyDataBase {
     var cardoc = getUsersCollection().doc(user.id);
     var ref = cardoc.update(user.tofirestore());
   }
+
+  static Future<List<User>> listofusers() async{
+    var snapshot = await getUsersCollection().get();
+    var list = snapshot.docs.map((doc) => doc.data()).toList();
+    return list ;
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:app/UI/theme/themedatafile.dart';
+import 'package:app/UI/user_interface/profilescreen.dart';
 import 'package:app/UI/user_interface/taps/Widding_tap.dart';
 import 'package:app/UI/user_interface/taps/longterm.dart';
 import 'package:app/UI/user_interface/taps/motorcycle_tap.dart';
@@ -34,7 +35,9 @@ class _User_Home_screenState extends State<User_Home_screen> {
         appBar: AppBar(
           actions:<Widget> [
             InkWell(
-              onTap: (){},
+              onTap: (){
+                Navigator.pushNamed(context, ProfleScreen.routeName);
+              },
               borderRadius: BorderRadius.circular(1000),
               child: Container(
                 padding: EdgeInsets.all(5),
