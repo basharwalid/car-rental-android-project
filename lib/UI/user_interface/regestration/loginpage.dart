@@ -1,6 +1,8 @@
 import 'package:app/FireBase_FireStore_DataBase/My_DataBase.dart';
+import 'package:app/FireBase_FireStore_DataBase/car/employee.dart';
 import 'package:app/FireBase_FireStore_DataBase/car/user.dart';
 import 'package:app/UI/Admin_Interface/Admin_home_Screen.dart';
+import 'package:app/UI/Emloyee/EmployeeHomeScreen.dart';
 import 'package:app/UI/theme/themedatafile.dart';
 import 'package:app/UI/user_interface/home_screen.dart';
 import 'package:app/UI/user_interface/regestration/createaccount.dart';
@@ -20,6 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   final formKey = GlobalKey<FormState>();
 
   List<User> users_list = [];
+  List<Employee> EmployeeList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +30,9 @@ class _LoginPageState extends State<LoginPage> {
     var mediaquere = MediaQuery.of(context).size;
     TextEditingController Email = TextEditingController();
     TextEditingController Password = TextEditingController();
+    if (EmployeeList.isEmpty ){
+      readdata();
+    }
     return StreamBuilder(
       stream: MyDataBase.getUserData(),
       builder: (context, snapshot) {
@@ -133,6 +139,14 @@ class _LoginPageState extends State<LoginPage> {
                         SizedBox(height: 10,),
                         ElevatedButton(
                           onPressed: (){
+                            for (int i = 0 ; i<EmployeeList.length ; i++){
+                              if(Email.text == EmployeeList[i].EmployeeEmail){
+                                if(Password.text == EmployeeList[i].EmployeePassword){
+                                  Navigator.popAndPushNamed(context, EmployeeHomeScreen.routeName);
+                                  return;
+                                }
+                              }
+                            }
                             for (int i =0 ; i < userslist!.length ;i++){
                               print(userslist[i].Email);
                               if (Email.text == userslist[i].Email){
@@ -181,10 +195,10 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // void readdata()async {
-  //   userslist = await MyDataBase.listofusers();
-  //   print(userslist.length);
-  //   setState(() {
-  //   });
-  // }
+  void readdata()async {
+    EmployeeList = await MyDataBase.listofemployee();
+    print(EmployeeList.length);
+    setState(() {
+    });
+  }
 }

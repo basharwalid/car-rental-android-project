@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:app/FireBase_FireStore_DataBase/car/user.dart';
 import 'package:app/UI/theme/themedatafile.dart';
+import 'package:app/UI/user_interface/regestration/loginpage.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -329,7 +330,7 @@ class _CreateAccountState extends State<CreateAccount> {
                               DialogUtils.showMessage(message: "Account Created", context: context ,
                                   posActiontitle: "Ok" ,
                                   posAction: (){
-                                    Navigator.pop(context);
+                                    Navigator.popAndPushNamed(context, LoginPage.routeName);
                                   }
                               );
                             }catch(Error){

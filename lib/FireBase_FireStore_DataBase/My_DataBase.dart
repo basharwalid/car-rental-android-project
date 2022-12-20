@@ -1,5 +1,6 @@
 import 'package:app/FireBase_FireStore_DataBase/car/car.dart';
 import 'package:app/FireBase_FireStore_DataBase/car/employee.dart';
+import 'package:app/FireBase_FireStore_DataBase/car/rent.dart';
 import 'package:app/FireBase_FireStore_DataBase/car/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -26,6 +27,9 @@ class  MyDataBase {
 
   static Stream<QuerySnapshot<Car>> getcardatastreamwithQuire(String departmentid){
     return getCarCollection().where('DepartmentID' , isEqualTo: departmentid ).where('isAvilable' , isEqualTo: true).snapshots();
+  }
+  static Stream<QuerySnapshot<Car>> getrentedcar(){
+    return getCarCollection().where('isAvilable' , isEqualTo: false).snapshots();
   }
 
   static deletecar(Car car) async{
@@ -65,6 +69,11 @@ class  MyDataBase {
     var cardoc = getEmployeeCollection().doc(employee.EmployeeID);
     var ref = cardoc.update(employee.tofirestore());
   }
+  static Future<List<Employee>> listofemployee() async{
+    var snapshot = await getEmployeeCollection().get();
+    var list = snapshot.docs.map((doc) => doc.data()).toList();
+    return list ;
+  }
 
   static CollectionReference<User> getUsersCollection(){
     var carcollectionref = FirebaseFirestore.instance.collection("Users").withConverter(
@@ -96,6 +105,40 @@ class  MyDataBase {
 
   static Future<List<User>> listofusers() async{
     var snapshot = await getUsersCollection().get();
+    var list = snapshot.docs.map((doc) => doc.data()).toList();
+    return list ;
+  }
+
+  static CollectionReference<Rent> getRentCollection(){
+    var carcollectionref = FirebaseFirestore.instance.collection("Rent").withConverter(
+        fromFirestore: (snapshot, options) => Rent.fromFireStore(snapshot.data()!),
+        toFirestore: (value, options) => value.toFireStore() );
+    return carcollectionref ;
+  }
+
+  static Future<void> insertRentData(Rent rent){
+    var ref = getRentCollection();
+    var doc = ref.doc();
+    rent.Rentid = doc.id ;
+    return doc.set(rent);
+  }
+
+  static Stream<QuerySnapshot<Rent>> getRentData(){
+    return getRentCollection().snapshots();
+  }
+
+  static deleterent(Rent rent) async{
+    var cardoc = getRentCollection().doc(rent.Rentid);
+    return cardoc.delete();
+  }
+
+  static updaterent(Rent rent) async {
+    var cardoc = getRentCollection().doc(rent.Rentid);
+    var ref = cardoc.update(rent.toFireStore());
+  }
+
+  static Future<List<Rent>> listofrent() async{
+    var snapshot = await getRentCollection().get();
     var list = snapshot.docs.map((doc) => doc.data()).toList();
     return list ;
   }

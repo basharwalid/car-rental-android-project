@@ -7,6 +7,8 @@ import 'package:app/UI/theme/themedatafile.dart';
 import 'package:flutter/material.dart';
 
 import '../../FireBase_FireStore_DataBase/My_DataBase.dart';
+import '../user_interface/profile/profilescreen.dart';
+import '../user_interface/regestration/loginpage.dart';
 
 
 class AdminHomeScree extends StatefulWidget {
@@ -33,6 +35,27 @@ class _AdminHomeScreeState extends State<AdminHomeScree> {
         ),
       ),
       child: Scaffold(
+        drawer: Drawer(
+            child: Column(
+              children: [
+                const SizedBox(height: 30,),
+                Row(
+                  children: [
+                    const SizedBox(width: 15,),
+                    const Icon(Icons.logout_rounded, size: 30, color:Colors.red,),
+                    const SizedBox(width: 10,),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.popAndPushNamed(context, LoginPage.routeName);
+                      },
+                      child:Text("Sign Out" , style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 22 ,fontWeight: FontWeight.w500, color: Colors.red),textAlign: TextAlign.start ,) ,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           title: const Text("Home"),

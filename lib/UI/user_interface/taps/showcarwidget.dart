@@ -1,6 +1,7 @@
 import 'package:app/FireBase_FireStore_DataBase/My_DataBase.dart';
 import 'package:app/FireBase_FireStore_DataBase/car/car.dart';
 import 'package:app/UI/theme/themedatafile.dart';
+import 'package:app/UI/user_interface/taps/Paymentpage.dart';
 import 'package:app/UI/user_interface/taps/viewcarsdetailsscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -93,7 +94,9 @@ class Show_car_Widget extends StatelessWidget {
                       Container(
                         margin: EdgeInsets.only(left: 15),
                         child: ElevatedButton(
-                              onPressed: (){},
+                              onPressed: (){
+                                Navigator.pushNamed(context, PaymentPage.routeName , arguments: car);
+                              },
                               style: ButtonStyle(
                                 padding: MaterialStateProperty.all(EdgeInsets.all(15)),
                                   backgroundColor:MaterialStateProperty.all(MyTheme.primarycolor),
