@@ -30,11 +30,12 @@ class ProfleScreen extends StatelessWidget {
           title:const Text('View Profile'),
         ),
         body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
               margin:const EdgeInsets.all(20),
               padding:const EdgeInsets.all(20),
-              height: mediaquery.height * 0.6,
+              height: mediaquery.height * 0.65,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 boxShadow:const [
@@ -48,6 +49,7 @@ class ProfleScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
+
                   // the image
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 10),
