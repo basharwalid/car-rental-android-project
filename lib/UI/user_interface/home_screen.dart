@@ -1,11 +1,15 @@
+import 'package:app/FireBase_FireStore_DataBase/car/user.dart';
 import 'package:app/UI/theme/themedatafile.dart';
 import 'package:app/UI/user_interface/profilescreen.dart';
+import 'package:app/UI/user_interface/regestration/loginpage.dart';
 import 'package:app/UI/user_interface/taps/Widding_tap.dart';
 import 'package:app/UI/user_interface/taps/longterm.dart';
 import 'package:app/UI/user_interface/taps/motorcycle_tap.dart';
 import 'package:app/UI/user_interface/taps/short_term_tap.dart';
+import 'package:app/userprovider.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class User_Home_screen extends StatefulWidget {
   static const String routeName = "usser home Screen" ;
@@ -19,6 +23,7 @@ class _User_Home_screenState extends State<User_Home_screen> {
   List<Widget> taps = [Long_term_tap(),Short_term_tap(),Widding_tap(),MotorCycle_tap()];
   @override
   Widget build(BuildContext context) {
+    User user = Provider.of<userprovider>(context).user;
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -33,24 +38,58 @@ class _User_Home_screenState extends State<User_Home_screen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          actions:<Widget> [
-            InkWell(
-              onTap: (){
-                Navigator.pushNamed(context, ProfleScreen.routeName);
-              },
-              borderRadius: BorderRadius.circular(1000),
-              child: Container(
-                padding: EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  border: Border.all(width: 3 , color: MyTheme.white),
-                  shape: BoxShape.circle
-                ),
-                child: Icon(Icons.person_rounded , size: 24,),
-              ),
-            ),
-            SizedBox(width: 20,)
-          ],
           title: Text('Home'),
+        ),
+        drawer: Drawer(
+          child: Column(
+              children: [
+                Container(
+                  margin:const EdgeInsets.only(top: 40),
+                  child: user.Iamge == null || user.Iamge.isEmpty ?
+                      const Icon(Icons.account_circle_rounded,size: 140, color: MyTheme.primarycolor,) :
+                      Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(image: NetworkImage(user.Iamge,),fit: BoxFit.cover),
+                          shape: BoxShape.circle
+                        ),
+                      )
+                    ,
+                ),
+                const SizedBox(height: 10,),
+                Text(user.Name , style:const TextStyle(fontSize: 18 , color: MyTheme.primarycolor , fontWeight: FontWeight.w500),),
+                const SizedBox(height: 30,),
+                Row(
+                  children: [
+                    const SizedBox(width: 15,),
+                    const Icon(Icons.person_outline_rounded , size: 30, color: MyTheme.primarycolor,),
+                    const SizedBox(width: 10,),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, ProfleScreen.routeName);
+                      },
+                      child:Text("View Profile" , style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 22 ,fontWeight: FontWeight.w500),textAlign: TextAlign.start,) ,
+                    ),
+                  ],
+                ),
+                Container(height: 1, margin: const EdgeInsets.symmetric(horizontal: 20 , vertical: 5), color: MyTheme.primarycolor,),
+                Row(
+                  children: [
+                    const SizedBox(width: 15,),
+                    const Icon(Icons.logout_rounded, size: 30, color:Colors.red,),
+                    const SizedBox(width: 10,),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.popAndPushNamed(context, LoginPage.routeName);
+                      },
+                      child:Text("Sign Out" , style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 22 ,fontWeight: FontWeight.w500, color: Colors.red),textAlign: TextAlign.start ,) ,
+                    ),
+                  ],
+                ),
+
+              ],
+          ),
         ),
         body: Column(
           children: [
@@ -63,6 +102,8 @@ class _User_Home_screenState extends State<User_Home_screen> {
           ],
         ),
         bottomNavigationBar: CurvedNavigationBar(
+          animationDuration: Duration(milliseconds: 300),
+
           backgroundColor: Colors.transparent,
           color: MyTheme.white,
           onTap: (value) {
