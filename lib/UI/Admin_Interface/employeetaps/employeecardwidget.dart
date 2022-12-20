@@ -109,7 +109,7 @@ class _EmployeeCardWidgetState extends State<EmployeeCardWidget> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      Text(widget.employee.EmployeeName ,style: Theme.of(context).textTheme.headline1!.copyWith(fontSize: 24),),
+                      Text(widget.employee.EmployeeName ,style: Theme.of(context).textTheme.headline1!.copyWith(fontSize: 24),textAlign: TextAlign.center,),
                       Text("Age : ${widget.employee.EmployeeAge}" ,style: Theme.of(context).textTheme.headline1!.copyWith(fontSize: 18),),
                       Text("Salary : ${widget.employee.EmployeeSalary} EGP" ,style: Theme.of(context).textTheme.headline1!.copyWith(fontSize: 18),),
                     ],

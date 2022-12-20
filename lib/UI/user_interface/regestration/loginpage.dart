@@ -198,7 +198,6 @@ class _LoginPageState extends State<LoginPage> {
   void readdata()async {
     EmployeeList = await MyDataBase.listofemployee();
     print(EmployeeList.length);
-    setState(() {
-    });
+    setState(() {});
   }
 }
