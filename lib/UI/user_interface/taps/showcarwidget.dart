@@ -39,7 +39,6 @@ class Show_car_Widget extends StatelessWidget {
           ],
         ),
         child: Container(
-          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               colors: [
@@ -58,6 +57,7 @@ class Show_car_Widget extends StatelessWidget {
               )
             ]
           ),
+          padding: EdgeInsets.only(top: 20 , left: 10),
           height:mediaQuere.height *0.22 ,
           child: Row(
             children: [
@@ -95,11 +95,12 @@ class Show_car_Widget extends StatelessWidget {
                         child: ElevatedButton(
                               onPressed: (){},
                               style: ButtonStyle(
+                                padding: MaterialStateProperty.all(EdgeInsets.all(15)),
                                   backgroundColor:MaterialStateProperty.all(MyTheme.primarycolor),
                                   fixedSize: MaterialStateProperty.all(Size.fromWidth(mediaQuere.width),),
-                                shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(1000)))
+                                shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomRight: Radius.circular(20), topLeft: Radius.circular(20))) )
                               ),
-                              child: Text('${car.Price} EGP' , style: TextStyle(fontSize: 16),)
+                              child: Text('Rent Now' , style: TextStyle(fontSize: 20),)
                           ),
                       )
                     ],

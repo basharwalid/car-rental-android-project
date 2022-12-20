@@ -30,25 +30,26 @@ class ViewCarDetailsScreen extends StatelessWidget {
           child: Column(
             children: [
               Container(
-                padding: EdgeInsets.all(20),
-                margin: EdgeInsets.symmetric(horizontal: 20),
-                height: mediaquery.height *0.4,
-                decoration: BoxDecoration(
-                  color: MyTheme.white,
-                  borderRadius: BorderRadius.only(bottomLeft:Radius.circular(30),bottomRight: Radius.circular(30)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.shade400,
-                      blurRadius: 20
-                    ),
-                  ],
-                ),
                 child: Image.network(car.Image),
               ),
-              SizedBox(height: 20,),
-              Text("${car.ManufacturCompany}" ,style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 30),),
-              SizedBox(height: 20,),
-              Text("${car.ManufacturCompany} ${car.CarModel}" ,style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 24),),
+              SizedBox(height: 30,),
+              Container(
+                width: mediaquery.width,
+                height: mediaquery.height,
+                margin: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: MyTheme.white,
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(30) , topRight: Radius.circular(30))
+                ),
+                child: Column(
+                  children: [
+                    SizedBox(height: 20,),
+                    Text("${car.ManufacturCompany}" ,style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 30),),
+                    SizedBox(height: 20,),
+                    Text("${car.ManufacturCompany} ${car.CarModel}" ,style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 24),),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
