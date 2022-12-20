@@ -1,6 +1,7 @@
 import 'package:app/FireBase_FireStore_DataBase/My_DataBase.dart';
 import 'package:app/FireBase_FireStore_DataBase/car/car.dart';
 import 'package:app/UI/theme/themedatafile.dart';
+import 'package:app/UI/user_interface/taps/viewcarsdetailsscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -28,6 +29,7 @@ class Show_car_Widget extends StatelessWidget {
               flex: 2,
               borderRadius: BorderRadius.only(topLeft: Radius.circular(20) ,bottomLeft: Radius.circular(20)),
               onPressed: (BuildContext) async {
+                Navigator.pushNamed(context, ViewCarDetailsScreen.routeName , arguments: car);
               },
               backgroundColor: MyTheme.blue,
               foregroundColor: Colors.white,

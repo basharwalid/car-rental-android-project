@@ -2,9 +2,11 @@ import 'package:app/UI/Admin_Interface/cartaps/editdataofthecar.dart';
 import 'package:app/UI/Admin_Interface/employeetaps/addEmployee.dart';
 import 'package:app/UI/Admin_Interface/employeetaps/editemployeescreen.dart';
 import 'package:app/UI/user_interface/home_screen.dart';
-import 'package:app/UI/user_interface/profilescreen.dart';
+import 'package:app/UI/user_interface/profile/EditProfileScreen.dart';
+import 'package:app/UI/user_interface/profile/profilescreen.dart';
 import 'package:app/UI/user_interface/regestration/createaccount.dart';
 import 'package:app/UI/user_interface/regestration/loginpage.dart';
+import 'package:app/UI/user_interface/taps/viewcarsdetailsscreen.dart';
 import 'package:app/userprovider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -45,6 +47,8 @@ class MyApp extends StatelessWidget {
         routes:{
           LoginPage.routeName :(_) => LoginPage(),
           ProfleScreen.routeName :(_) => ProfleScreen(),
+          EditProfileScreen.routeName :(_) => EditProfileScreen(),
+          ViewCarDetailsScreen.routeName :(_) => ViewCarDetailsScreen(),
           CreateAccount.routeName :(_) => CreateAccount(),
           User_Home_screen.routeName : (_) => User_Home_screen(),
           AddEmployeeSCreen.routeName :(_) => AddEmployeeSCreen(),

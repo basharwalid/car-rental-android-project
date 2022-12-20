@@ -1,35 +1,34 @@
 import 'dart:io';
-import 'package:app/FireBase_FireStore_DataBase/car/user.dart';
-import 'package:app/UI/theme/themedatafile.dart';
+
+import 'package:app/userprovider.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 import '../../../FireBase_FireStore_DataBase/My_DataBase.dart';
+import '../../../FireBase_FireStore_DataBase/car/user.dart';
 import '../../../utils/Dialogs_utils_class.dart';
+import '../../theme/themedatafile.dart';
 
-class CreateAccount extends StatefulWidget {
-  static const routeName = "create account";
+class EditProfileScreen extends StatefulWidget {
+  static const String routeName = 'Edit proflie screen';
 
   @override
-  State<CreateAccount> createState() => _CreateAccountState();
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
-class _CreateAccountState extends State<CreateAccount> {
-  User user = User(
-      id: '',
-      Name: '',
-      Email: '',
-      Password: '',
-      PhoneNumber: '',
-      Country: '',
-      Iamge: ''
-  );
+class _EditProfileScreenState extends State<EditProfileScreen> {
+
   File? image;
+
   XFile? pickedImage ;
+
   final imagepicker = ImagePicker();
+
   UploadTask? uploadTask ;
+
   uploadImage() async {
     // the image in the page
     XFile? picked_Image = await imagepicker.pickImage(source: ImageSource.gallery);
@@ -38,18 +37,25 @@ class _CreateAccountState extends State<CreateAccount> {
     image = File(pickedImage!.path);
     setState(() {});
   }
+
   final formKey = GlobalKey<FormState>();
 
   TextEditingController UserName  = TextEditingController();
+
   TextEditingController Email  = TextEditingController();
+
   TextEditingController Password  = TextEditingController();
+
   TextEditingController re_Password  = TextEditingController();
+
   TextEditingController PhoneNumber  = TextEditingController();
+
   TextEditingController Country  = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     var mediaquery = MediaQuery.of(context).size;
+    User user = Provider.of<userprovider>(context).user;
     return Container(
       decoration:const BoxDecoration(
         gradient: LinearGradient(
@@ -64,7 +70,7 @@ class _CreateAccountState extends State<CreateAccount> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          title: Text('Create Account'),
+          title: const Text('Edit Account'),
           elevation: 0,
         ),
         body: SingleChildScrollView(
@@ -127,11 +133,8 @@ class _CreateAccountState extends State<CreateAccount> {
                                 borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                                 borderRadius: BorderRadius.circular(10))),
                         cursorColor: MyTheme.primarycolor,
-                        validator: (value) {
-                          if (value == null || value.isEmpty )
-                            return 'Enter a valid User Name address';
-                          else
-                            return null;
+                        onChanged: (value){
+                          user.Name = value ;
                         },
 
                       ),
@@ -159,16 +162,8 @@ class _CreateAccountState extends State<CreateAccount> {
                                 borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                                 borderRadius: BorderRadius.circular(10))),
                         cursorColor: MyTheme.primarycolor,
-                        validator: (value) {
-                          String pattern =
-                              r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]"
-                              r"{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]"
-                              r"{0,253}[a-zA-Z0-9])?)*$";
-                          RegExp regex = RegExp(pattern);
-                          if (value == null || value.isEmpty || !regex.hasMatch(value))
-                            return 'Enter a valid email address';
-                          else
-                            return null;
+                        onChanged: (value){
+                          user.Email = value ;
                         },
 
                       ),
@@ -199,11 +194,8 @@ class _CreateAccountState extends State<CreateAccount> {
                                 borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                                 borderRadius: BorderRadius.circular(10))),
                         cursorColor: MyTheme.primarycolor,
-                        validator: (value) {
-                          if (value!.trim().isEmpty) {
-                            return 'Password is required';
-                          }
-                          return null;
+                        onChanged: (value){
+                          user.Password = value ;
                         },
                       ),
                     ),
@@ -268,13 +260,9 @@ class _CreateAccountState extends State<CreateAccount> {
                                 borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                                 borderRadius: BorderRadius.circular(10))),
                         cursorColor: MyTheme.primarycolor,
-                        validator: (value) {
-                          if (value!.trim().isEmpty) {
-                            return 'Invalid Phone Number';
-                          }
-                          return null;
+                        onChanged: (value){
+                          user.PhoneNumber = value ;
                         },
-
                       ),
                     ),
                     // Country
@@ -300,13 +288,9 @@ class _CreateAccountState extends State<CreateAccount> {
                                 borderSide:const BorderSide(width: 1, color: MyTheme.primarycolor),
                                 borderRadius: BorderRadius.circular(10))),
                         cursorColor: MyTheme.primarycolor,
-                        validator: (value) {
-                          if (value!.trim().isEmpty) {
-                            return 'Invalid Country';
-                          }
-                          return null;
+                        onChanged: (value){
+                          user.Country = value ;
                         },
-
                       ),
                     ),
 
@@ -317,16 +301,11 @@ class _CreateAccountState extends State<CreateAccount> {
                         onPressed: ()async{
                           final isvalidform = formKey.currentState!.validate();
                           if (isvalidform){
-                            user.Name = UserName.text;
-                            user.Email = Email.text;
-                            user.Password = Password.text;
-                            user.PhoneNumber = PhoneNumber.text;
-                            user.Country = Country.text;
                             DialogUtils.showDialogeMessage(Message: "Loading...", context: context);
                             try{
-                              await insertdata();
+                              await updatedata(user);
                               DialogUtils.hideDialogMessage(context: context);
-                              DialogUtils.showMessage(message: "Account Created", context: context ,
+                              DialogUtils.showMessage(message: "Account Updated", context: context ,
                                   posActiontitle: "Ok" ,
                                   posAction: (){
                                     Navigator.pop(context);
@@ -336,7 +315,7 @@ class _CreateAccountState extends State<CreateAccount> {
                               DialogUtils.hideDialogMessage(context: context);
                               DialogUtils.showMessage(message: "Error inserting data", context: context,
                                 posAction: () async{
-                                  await insertdata();
+                                  await updatedata(user);
                                 },
                                 posActiontitle: "Try Again",
                                 nigAction: (){
@@ -355,9 +334,10 @@ class _CreateAccountState extends State<CreateAccount> {
                               borderRadius: BorderRadius.circular(200),
                             )
                         ),
-                        child: Text("Create Account",style: Theme.of(context).textTheme.headline2?.copyWith(fontSize: 24,fontWeight: FontWeight.w500),),
+                        child: Text("Edit Account",style: Theme.of(context).textTheme.headline2?.copyWith(fontSize: 24,fontWeight: FontWeight.w500),),
                       ),
                     ),
+
                   ],
                 ),
               ),
@@ -367,7 +347,8 @@ class _CreateAccountState extends State<CreateAccount> {
       ),
     );
   }
-  Future<void> insertdata () async{
+
+  Future<void> updatedata(User user) async{
     final isvalidform = formKey.currentState!.validate();
     if( isvalidform ){
       if(pickedImage != null){
@@ -379,7 +360,7 @@ class _CreateAccountState extends State<CreateAccount> {
         final url = await snapshot.ref.getDownloadURL();
         user.Iamge = url;
       }
-      await MyDataBase.insertUserData(user);
+      await MyDataBase.updateUser(user);
     }
   }
 }
